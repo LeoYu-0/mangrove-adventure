@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>红树林超能力大冒险 · 小学生科普互动</title>
+<style>
+  :root{
+    --ink:#37474f; --ink-soft:#607d8b;
+    --sea:#0288d1; --sea-light:#4fc3f7;
+    --leaf:#43a047; --leaf-deep:#1b5e20;
+    --sun:#ffb300; --sun-light:#ffd54f;
+    --card:#ffffff;
+    --shadow:0 8px 24px rgba(38,50,56,.12);
+    --radius:22px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  [hidden]{display:none!important}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Source Han Sans SC",sans-serif;
+    background:linear-gradient(180deg,#dff1fb 0%,#e8f5e9 55%,#fff8e1 100%);
+    color:var(--ink); line-height:1.6;
+    height:100vh; height:100dvh; overflow:hidden; display:flex; flex-direction:column;
+  }
+  .wrap{flex:1;min-height:0;width:100%;max-width:1280px;margin:0 auto;padding:10px 16px 6px;
+    display:flex;flex-direction:column;gap:10px}
+
+  header{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+  .h-title{font-size:22px;font-weight:900;letter-spacing:.5px;white-space:nowrap}
+  .h-sub{font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-top:1px;white-space:nowrap}
+  .h-tools{display:flex;gap:8px;flex-wrap:wrap}
+  .tool-btn{border:none;background:#fff;border-radius:999px;padding:8px 15px;font-size:13.5px;font-weight:800;
+    color:var(--ink);cursor:pointer;box-shadow:var(--shadow);font-family:inherit;transition:transform .15s;white-space:nowrap;
+    display:inline-flex;align-items:center;gap:6px}
+  .tool-btn:hover{transform:translateY(-2px)}
+  .tool-btn:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+
+  main.board{flex:1;min-height:0;display:grid;grid-template-columns:1.08fr .92fr;gap:12px;align-items:stretch}
+  .col-left{display:flex;flex-direction:column;gap:10px;min-height:0;overflow:auto}
+  .col-right{min-height:0;display:flex}
+
+  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px}
+
+  /* ---------- 行内图片图标 ---------- */
+  .ic{height:1.3em;width:auto;vertical-align:-.25em;display:inline-block}
+  .h-title .ic{height:27px;vertical-align:-5px}
+  .tool-btn .ic{height:17px}
+
+  .scene-card{flex:0 0 auto;padding:10px}
+  .scene{position:relative;width:100%;border-radius:16px;overflow:hidden;user-select:none;-webkit-user-select:none;
+    box-shadow:inset 0 0 0 4px rgba(255,255,255,.65)}
+  .scene svg{display:block;width:100%;height:auto;max-height:50vh}
+  .scene-intro{position:absolute;inset:0;background:rgba(255,255,255,.88);backdrop-filter:blur(3px);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:22px;z-index:20}
+  .si-emoji-img{height:56px;width:auto;animation:bounce 1.6s infinite}
+  .scene-intro h2{font-size:22px;font-weight:900}
+  .scene-intro p{font-size:14.5px;color:var(--ink-soft);max-width:440px}
+  .scene-toast{position:absolute;top:12px;left:50%;transform:translateX(-50%) translateY(-10px);
+    background:#fff;border:2px solid var(--sun-light);color:#5d4037;font-weight:800;font-size:14px;
+    padding:7px 18px;border-radius:999px;box-shadow:var(--shadow);opacity:0;transition:all .35s;z-index:15;pointer-events:none;
+    max-width:92%;text-align:center}
+  .scene-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  .tide-switch{position:absolute;top:10px;right:10px;display:flex;gap:6px;z-index:12}
+  .tide-btn{border:2px solid #fff;background:rgba(255,255,255,.9);border-radius:999px;padding:6px 13px;
+    font-size:13px;font-weight:800;color:var(--sea);cursor:pointer;font-family:inherit;box-shadow:0 2px 8px rgba(0,0,0,.18);
+    display:inline-flex;align-items:center;gap:5px}
+  .tide-btn .ic{height:16px}
+  .tide-btn.active{background:var(--sea);color:#fff;border-color:var(--sea)}
+  .tide-btn.active .ic{filter:brightness(0) invert(1)}
+  .tide-btn:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+
+  .hs{cursor:pointer}
+  .hs .hs-bg{filter:drop-shadow(0 3px 5px rgba(0,0,0,.28))}
+  .hs .hs-label{opacity:0;transition:opacity .2s;paint-order:stroke;stroke:#fff;stroke-width:4;stroke-linejoin:round;fill:#37474f}
+  .hs:hover .hs-label{opacity:1}
+  .hs-ring{transform-box:fill-box;transform-origin:center;animation:pulse 2.2s ease-out infinite}
+  @keyframes pulse{0%{transform:scale(.62);opacity:.95}70%{transform:scale(1.3);opacity:0}100%{opacity:0}}
+  .hs.locked{filter:grayscale(1);opacity:.6;cursor:not-allowed}
+  .hs.locked .hs-ring{animation:none}
+  .hs.unlocked .hs-bg{stroke:var(--sun);stroke-width:4}
+  .hs-img,.scene-emoji-img{pointer-events:none}
+  .clickable{cursor:pointer}
+  .fish.clickable:hover{filter:brightness(1.18)}
+
+  .panel-card{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column}
+  .pills{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
+  .pill{display:flex;align-items:center;gap:5px;background:#eceff1;border-radius:999px;padding:5px 11px;
+    font-size:13px;font-weight:800;color:#78909c;transition:all .4s}
+  .pill .ic{height:16px}
+  .pill .p-st{font-weight:600;font-size:11.5px;opacity:.85}
+  .pill.done{background:linear-gradient(135deg,#e8f5e9,#c8e6c9);color:var(--leaf-deep);
+    box-shadow:0 3px 10px rgba(67,160,71,.28);animation:popIn .45s}
+  .ch-head{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:4px}
+  .ch-no{background:var(--sea);color:#fff;font-size:12px;font-weight:800;border-radius:999px;padding:3px 11px}
+  .ch-title{font-size:17.5px;font-weight:900}
+  .ch-emoji-img{height:44px;width:auto;display:block;margin:2px auto 4px}
+  .ch-scenario{font-size:14.5px;line-height:1.7;background:#f1f8ff;border:2px dashed #b3e5fc;border-radius:14px;
+    padding:10px 13px;margin-bottom:11px}
+  .options{display:flex;flex-direction:column;gap:8px}
+  .opt{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;background:#f7fbfd;
+    border:2px solid #dceef5;border-radius:14px;padding:10px 13px;font-size:14px;line-height:1.5;cursor:pointer;
+    transition:border-color .15s,background .15s,transform .15s;margin:0;font-family:inherit;color:var(--ink)}
+  .opt:hover:not(:disabled){border-color:var(--sea-light);background:#e8f6fe;transform:translateY(-2px)}
+  .opt:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+  .opt .opt-badge{flex:0 0 auto;width:30px;height:30px;border-radius:9px;background:#fff;border:2px solid #b3e5fc;
+    display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;color:var(--sea)}
+  .opt.correct{border-color:#81c784;background:#e8f5e9}
+  .opt.wrong{border-color:#ef9a9a;background:#ffebee;animation:shake .4s}
+  .opt:disabled{cursor:default;opacity:.9}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  .hint-btn{margin-top:9px;background:#fff8e1;border:2px solid var(--sun-light);color:#8d6e63;font-weight:800;
+    border-radius:999px;padding:6px 15px;font-size:13px;cursor:pointer;font-family:inherit;
+    display:inline-flex;align-items:center;gap:6px}
+  .hint-btn .ic{height:15px}
+  .hint-btn:hover{background:#ffecb3}
+  .hint-box{margin-top:8px;background:#fffde7;border-left:5px solid var(--sun);border-radius:10px;
+    padding:9px 12px;font-size:13.5px;color:#6d4c41}
+  .feedback{margin-top:10px;border-radius:14px;padding:12px 14px;font-size:13.5px;line-height:1.65;animation:popIn .3s}
+  .feedback.correct{background:#e8f5e9;border:2px solid #a5d6a7;color:#1b5e20}
+  .feedback.wrong{background:#fff3e0;border:2px solid #ffcc80;color:#e65100}
+  .fb-title{font-size:15.5px;font-weight:900;margin-bottom:4px}
+  .feedback .btn{margin-top:9px}
+  .win-panel{text-align:center;padding:6px 4px}
+  .wp-emoji-img{height:58px;width:auto;display:block;margin:0 auto 2px;animation:bounce 1.4s infinite}
+  .win-panel h3{font-size:20px;font-weight:900;margin:6px 0 4px}
+  .win-panel p{font-size:14px;color:var(--ink-soft);margin-bottom:12px}
+  .win-actions{display:flex;gap:9px;justify-content:center;flex-wrap:wrap}
+
+  .btn{border:none;border-radius:999px;padding:10px 22px;font-size:14px;font-weight:800;cursor:pointer;
+    font-family:inherit;transition:transform .15s,box-shadow .15s;display:inline-flex;align-items:center;gap:7px}
+  .btn .ic{height:16px}
+  .btn:hover{transform:translateY(-2px)}
+  .btn:active{transform:translateY(0)}
+  .btn:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+  .btn-primary{background:linear-gradient(135deg,#66bb6a,#43a047);color:#fff;box-shadow:0 4px 14px rgba(67,160,71,.35)}
+  .btn-sun{background:linear-gradient(135deg,#ffd54f,#ffb300);color:#5d4037;box-shadow:0 4px 14px rgba(255,179,0,.35)}
+  .btn-ghost{background:#fff;color:var(--sea);border:2px solid #b3e5fc}
+
+  .table-card{flex:0 0 auto;padding:12px 14px}
+  .tc-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:2px}
+  .tc-head h2{font-size:16.5px;font-weight:900}
+  .tc-note{font-size:12px;color:var(--ink-soft);margin-bottom:8px}
+  .table-scroll{overflow-x:auto}
+  table{width:100%;border-collapse:separate;border-spacing:0 6px;min-width:520px}
+  th{font-size:13px;font-weight:900;padding:2px 10px;text-align:left;color:var(--ink)}
+  td{padding:8px 10px;font-size:12.8px;line-height:1.45;background:#fafafa;border-top:2px solid #fff;border-bottom:2px solid #fff}
+  td .ic{height:14px;margin-right:3px;vertical-align:-2px}
+  th .ic{height:16px;vertical-align:-3px;margin-right:3px}
+  td.c-name{font-weight:900;border-radius:12px 0 0 12px;background:#eceff1;white-space:nowrap}
+  td.c-name .ic{height:15px;margin-right:2px}
+  td.c-mangrove{border-radius:0 12px 12px 0}
+  tr.locked td{color:#b0bec5;background:#f5f5f5}
+  tr.locked td.c-name{color:#607d8b}
+  td.c-normal.unlocked{background:#ffebee;color:#b71c1c}
+  td.c-mangrove.unlocked{background:#e8f5e9;color:var(--leaf-deep)}
+  tr.result td{font-size:13.5px}
+  tr.result td.c-normal.unlocked{background:#ffcdd2;color:#b71c1c;font-weight:900}
+  tr.result td.c-mangrove.unlocked{background:#c8e6c9;color:var(--leaf-deep);font-weight:900}
+  tr.row-in td{animation:rowIn .65s ease both}
+  @keyframes rowIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+  .tc-tip{margin-top:8px;font-size:11.5px;color:var(--ink-soft);background:#f1f8e9;border-radius:10px;padding:7px 11px;
+    display:flex;align-items:center;gap:7px}
+  .tc-tip .ic{height:18px;flex:0 0 auto}
+  @media (max-height:780px){.tc-tip{display:none}}
+
+  footer{font-size:11px;color:#90a4ae;text-align:center;line-height:1.5;padding-bottom:2px}
+
+  .mask{position:fixed;inset:0;background:rgba(38,50,56,.5);backdrop-filter:blur(2px);display:flex;
+    align-items:center;justify-content:center;padding:18px;z-index:100}
+  .modal{background:#fff;border-radius:24px;max-width:620px;width:100%;max-height:88vh;overflow:auto;
+    padding:26px 24px 22px;position:relative;box-shadow:0 24px 60px rgba(0,0,0,.28);animation:popIn .35s}
+  @keyframes popIn{from{opacity:0;transform:scale(.85) translateY(14px)}to{opacity:1;transform:none}}
+  .modal-close{position:absolute;top:13px;right:13px;width:36px;height:36px;border-radius:50%;border:none;
+    background:#eceff1;font-size:16px;font-weight:900;color:var(--ink-soft);cursor:pointer;font-family:inherit}
+  .modal-close:hover{background:#cfd8dc}
+  .modal-emoji-img{height:54px;width:auto;display:block;margin:0 auto}
+  .modal-title{font-size:20px;font-weight:900;text-align:center;margin:5px 0 10px}
+  .modal-body{font-size:14.5px;line-height:1.8}
+  .modal-extra{margin-top:12px;background:#fff8e1;border:2px dashed var(--sun-light);border-radius:13px;
+    padding:10px 13px;font-size:13.5px;color:#6d4c41;line-height:1.65}
+  .modal-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+  @media (max-width:560px){.modal-cards{grid-template-columns:1fr}}
+  .fam-card{background:#f1f8e9;border:2px solid #c5e1a5;border-radius:14px;padding:12px 11px;text-align:center}
+  .fc-ico-img{height:36px;width:auto;display:block;margin:0 auto 2px}
+  .fam-card .fc-name{font-size:15px;font-weight:900;margin:3px 0 2px}
+  .fam-card .fc-tag{display:inline-block;background:var(--leaf);color:#fff;font-size:11px;font-weight:800;
+    border-radius:999px;padding:2px 10px;margin-bottom:6px}
+  .fam-card .fc-desc{font-size:12.5px;line-height:1.6;color:#558b2f;text-align:left}
+  .modal-actions{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+
+  .sun-g{transform-box:fill-box;transform-origin:center;animation:sunPulse 4s ease-in-out infinite}
+  @keyframes sunPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+  .cloud{animation:drift 30s linear infinite}
+  .c2{animation-duration:42s;animation-delay:-14s}
+  @keyframes drift{from{transform:translateX(-160px)}to{transform:translateX(960px)}}
+  .birds{animation:bob 5s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  #tideGroup{transform-box:fill-box;transform-origin:center;transition:transform 1.2s ease}
+  .tide-high #tideGroup{transform:scaleY(1.62)}
+  .tide-low #tideGroup{transform:scaleY(.5)}
+  .waves{animation:waveMove 7s linear infinite}
+  @keyframes waveMove{from{transform:translateX(0)}to{transform:translateX(-900px)}}
+  .fish{animation:swim 9s ease-in-out infinite alternate}
+  @keyframes swim{from{transform:translateX(0) translateY(0)}50%{transform:translateY(-9px)}to{transform:translateX(150px) translateY(4px)}}
+  .f2{animation-duration:11s;animation-delay:-3s}
+  .f2{animation-name:swim2}
+  @keyframes swim2{from{transform:translateX(0)}to{transform:translateX(-90px)}}
+  .bub{animation:rise 3.4s ease-in infinite;opacity:0}
+  .bub:nth-of-type(2){animation-delay:1.1s}
+  .bub:nth-of-type(3){animation-delay:2.2s}
+  @keyframes rise{0%{transform:translateY(0);opacity:0}20%{opacity:.85}100%{transform:translateY(-60px);opacity:0}}
+  .tree{transform-box:fill-box;transform-origin:bottom center;animation:sway 6.5s ease-in-out infinite alternate}
+  @keyframes sway{from{transform:rotate(-.7deg)}to{transform:rotate(.7deg)}}
+  #fx-salt{opacity:0;transition:opacity .9s}
+  #fx-salt.show{opacity:1}
+  #fx-salt .crys{animation:twinkle 2.6s ease-in-out infinite}
+  #fx-salt .crys:nth-child(2n){animation-delay:.7s}
+  #fx-salt .crys:nth-child(3n){animation-delay:1.3s}
+  @keyframes twinkle{0%,100%{opacity:.5}50%{opacity:1}}
+  #fx-roots rect{transform-box:fill-box;transform-origin:center bottom;transform:scaleY(0);
+    transition:transform .85s cubic-bezier(.34,1.56,.64,1)}
+  #fx-roots.show rect{transform:scaleY(1)}
+  #fx-roots.show rect:nth-child(2){transition-delay:.07s}
+  #fx-roots.show rect:nth-child(3){transition-delay:.14s}
+  #fx-roots.show rect:nth-child(4){transition-delay:.21s}
+  #fx-roots.show rect:nth-child(5){transition-delay:.28s}
+  #fx-roots.show rect:nth-child(6){transition-delay:.35s}
+  #fx-roots.show rect:nth-child(7){transition-delay:.42s}
+  #fx-roots.show rect:nth-child(8){transition-delay:.49s}
+  #fx-roots.show rect:nth-child(9){transition-delay:.56s}
+  #fx-roots.show rect:nth-child(10){transition-delay:.63s}
+  #fx-sprout{opacity:0}
+  .bounce{animation:bounce 1.5s infinite}
+  @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+
+  .confetti{position:fixed;top:-14px;width:9px;height:14px;border-radius:2px;z-index:200;pointer-events:none;
+    animation:fall linear forwards}
+  @keyframes fall{to{transform:translateY(106vh) rotate(760deg);opacity:.95}}
+
+  @media (max-width:920px){
+    body{height:auto;overflow:auto}
+    main.board{grid-template-columns:1fr}
+    .scene svg{max-height:none}
+    .col-left,.col-right,.panel-card{overflow:visible}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation:none!important;transition:none!important}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <div class="h-title"><img class="ic" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGNpcmNsZSBjeD0iMzIiIGN5PSIyMCIgcj0iMTUiIGZpbGw9IiM0M2EwNDciLz4KICA8Y2lyY2xlIGN4PSIyNSIgY3k9IjE2IiByPSI1IiBmaWxsPSIjNjZiYjZhIi8+CiAgPHJlY3QgeD0iMjkiIHk9IjMwIiB3aWR0aD0iNiIgaGVpZ2h0PSIxOCIgcng9IjIiIGZpbGw9IiM2ZDRjNDEiLz4KICA8ZyBzdHJva2U9IiM2ZDRjNDEiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIj4KICAgIDxwYXRoIGQ9Ik0yOSA0NiBDMjQgNTAgMjAgNTIgMTQgNTQiLz4KICAgIDxwYXRoIGQ9Ik0zNSA0NiBDNDAgNTAgNDQgNTIgNTAgNTQiLz4KICAgIDxwYXRoIGQ9Ik0zMiA0NyBDMzIgNTEgMzEgNTMgMjkgNTYiLz4KICA8L2c+CiAgPHJlY3QgeD0iNiIgeT0iNTUiIHdpZHRoPSI1MiIgaGVpZ2h0PSI2IiByeD0iMyIgZmlsbD0iI2ExODg3ZiIvPgo8L3N2Zz4K" alt="">红树林超能力大冒险</div>
+      <div class="h-sub">泌盐 · 呼吸根 · 胎生 · 支柱根 · 净化 —— 五重生存考验（小学生科普互动）</div>
+    </div>
+    <div class="h-tools">
+      <button class="tool-btn" id="fsBtn"><img class="ic" id="fsImg" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGcgc3Ryb2tlPSIjMDI4OGQxIiBzdHJva2Utd2lkdGg9IjUiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+CiAgICA8cGF0aCBkPSJNMjIgMTAgVjIyIEgxMCIvPgogICAgPHBhdGggZD0iTTQyIDEwIFYyMiBINTQiLz4KICAgIDxwYXRoIGQ9Ik0yMiA1NCBWNDIgSDEwIi8+CiAgICA8cGF0aCBkPSJNNDIgNTQgVjQyIEg1NCIvPgogIDwvZz4KPC9zdmc+Cg==" alt=""><span id="fsTxt">全屏</span></button>
+      <button class="tool-btn" id="dexBtn"><img class="ic" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHBhdGggZD0iTTMyIDE4IEMyNiAxMiAxNiAxMSAxMCAxMyB2MjggYzYgLTIgMTYgLTEgMjIgNiB6IiBmaWxsPSIjNGZjM2Y3IiBzdHJva2U9IiMwMjg4ZDEiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgPHBhdGggZD0iTTMyIDE4IGM2IC02IDE2IC03IDIyIC01IHYyOCBjLTYgLTIgLTE2IC0xIC0yMiA2IHoiIGZpbGw9IiM4MWQ0ZmEiIHN0cm9rZT0iIzAyODhkMSIgc3Ryb2tlLXdpZHRoPSIyLjIiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8cGF0aCBkPSJNMzIgMTggdjM0IiBzdHJva2U9IiMwMjg4ZDEiIHN0cm9rZS13aWR0aD0iMi40Ii8+CiAgPGcgc3Ryb2tlPSIjZTFmNWZlIiBzdHJva2Utd2lkdGg9IjIuNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj4KICAgIDxwYXRoIGQ9Ik0xNiAyMiBoMTAiLz4KICAgIDxwYXRoIGQ9Ik0xNiAyOSBoMTAiLz4KICAgIDxwYXRoIGQ9Ik0zOCAyMiBoMTAiLz4KICAgIDxwYXRoIGQ9Ik0zOCAyOSBoMTAiLz4KICA8L2c+Cjwvc3ZnPgo=" alt="">红树图鉴</button>
+      <button class="tool-btn" id="soundBtn"><img class="ic" id="soundImg" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHBhdGggZD0iTTEyIDI0IGg3IGwxMiAtOSB2MzQgbC0xMiAtOSBoLTcgeiIgZmlsbD0iIzAyODhkMSIvPgogIDxnIHN0cm9rZT0iIzAyODhkMSIgc3Ryb2tlLXdpZHRoPSIzLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCI+CiAgICA8cGF0aCBkPSJNMzggMjIgYTEyIDEyIDAgMCAxIDAgMjAiLz4KICAgIDxwYXRoIGQ9Ik00NSAxNiBhMjIgMjIgMCAwIDEgMCAzMiIvPgogIDwvZz4KPC9zdmc+Cg==" alt=""><span id="soundTxt">音效开</span></button>
+      <button class="tool-btn" id="restartBtn"><img class="ic" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHBhdGggZD0iTTUyIDMyIGEyMCAyMCAwIDEgMSAtNiAtMTQuNCIgc3Ryb2tlPSIjMDI4OGQxIiBzdHJva2Utd2lkdGg9IjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01MiA4IHYxMiBoLTEyIHoiIGZpbGw9IiMwMjg4ZDEiLz4KPC9zdmc+Cg==" alt="">重新开始</button>
+    </div>
+  </header>
+
+  <main class="board">
+
+    <div class="col-left">
+      <section class="card scene-card">
+        <div class="scene" id="scene">
+          <svg viewBox="0 0 900 520" xmlns:xlink="http://www.w3.org/1999/xlink" role="img" aria-label="红树林潮间带场景，可点击树干、落叶、小鱼、招潮蟹、滩涂等发现秘密">
+            <defs>
+              <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#bbdefb"/><stop offset="1" stop-color="#e3f2fd"/>
+              </linearGradient>
+              <linearGradient id="seaG" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#4fc3f7"/><stop offset="1" stop-color="#0277bd"/>
+              </linearGradient>
+              <linearGradient id="mudG" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#a1887f"/><stop offset="1" stop-color="#5d4037"/>
+              </linearGradient>
+            </defs>
+
+            <rect x="0" y="0" width="900" height="306" fill="url(#skyG)"/>
+
+            <g class="sun-g">
+              <g stroke="#ffca28" stroke-width="5" stroke-linecap="round">
+                <line x1="785" y1="20" x2="785" y2="7"/>
+                <line x1="785" y1="20" x2="785" y2="7" transform="rotate(45 785 72)"/>
+                <line x1="785" y1="20" x2="785" y2="7" transform="rotate(90 785 72)"/>
+                <line x1="785" y1="20" x2="785" y2="7" transform="rotate(135 785 72)"/>
+                <line x1="785" y1="20" x2="785" y2="7" transform="rotate(180 785 72)"/>
+                <line x1="785" y1="20" x2="785" y2="7" transform="rotate(225 785 72)"/>
+                <line x1="785" y1="20" x2="785" y2="7" transform="rotate(270 785 72)"/>
+                <line x1="785" y1="20" x2="785" y2="7" transform="rotate(315 785 72)"/>
+              </g>
+              <circle cx="785" cy="72" r="34" fill="#ffd54f" stroke="#ffb300" stroke-width="3"/>
+              <circle cx="776" cy="66" r="3.2" fill="#f57f17"/>
+              <circle cx="794" cy="66" r="3.2" fill="#f57f17"/>
+              <path d="M774 80 q11 10 22 0" stroke="#f57f17" stroke-width="3" fill="none" stroke-linecap="round"/>
+            </g>
+
+            <g class="cloud c1" opacity=".95">
+              <ellipse cx="150" cy="72" rx="46" ry="21" fill="#fff"/>
+              <ellipse cx="184" cy="63" rx="33" ry="19" fill="#fff"/>
+              <ellipse cx="120" cy="78" rx="29" ry="15" fill="#fff"/>
+            </g>
+            <g class="cloud c2" opacity=".8">
+              <ellipse cx="520" cy="50" rx="40" ry="18" fill="#fff"/>
+              <ellipse cx="548" cy="43" rx="27" ry="15" fill="#fff"/>
+              <ellipse cx="496" cy="55" rx="24" ry="12" fill="#fff"/>
+            </g>
+
+            <g class="birds" stroke="#546e7a" stroke-width="3" fill="none" stroke-linecap="round">
+              <path d="M150 118 q10 -10 20 0 q10 -10 20 0"/>
+              <path d="M196 100 q8 -8 16 0 q8 -8 16 0"/>
+            </g>
+
+            <path d="M0 306 L900 306 L900 520 L0 520 Z" fill="url(#mudG)"/>
+            <g fill="#4e342e" opacity=".22">
+              <ellipse cx="120" cy="470" rx="10" ry="4"/>
+              <ellipse cx="200" cy="505" rx="8" ry="3.5"/>
+              <ellipse cx="470" cy="460" rx="9" ry="4"/>
+              <ellipse cx="640" cy="500" rx="11" ry="4.5"/>
+              <ellipse cx="810" cy="470" rx="9" ry="4"/>
+              <ellipse cx="70" cy="440" rx="7" ry="3"/>
+            </g>
+
+            <g class="tree">
+              <g stroke="#6d4c41" stroke-width="11" fill="none" stroke-linecap="round">
+                <path d="M291 393 C275 406 257 419 236 431"/>
+                <path d="M311 393 C326 405 344 417 365 429"/>
+                <path d="M301 395 C297 413 293 429 287 446"/>
+              </g>
+              <g id="fx-roots" fill="#8d6e63" stroke="#4e342e" stroke-width="1.5">
+                <rect x="250" y="354" width="8" height="31" rx="4"/>
+                <rect x="263" y="360" width="8" height="25" rx="4"/>
+                <rect x="276" y="352" width="8" height="33" rx="4"/>
+                <rect x="289" y="357" width="8" height="28" rx="4"/>
+                <rect x="302" y="350" width="8" height="35" rx="4"/>
+                <rect x="315" y="358" width="8" height="27" rx="4"/>
+                <rect x="328" y="353" width="8" height="32" rx="4"/>
+                <rect x="341" y="359" width="8" height="26" rx="4"/>
+                <rect x="354" y="355" width="8" height="30" rx="4"/>
+                <rect x="366" y="361" width="8" height="24" rx="4"/>
+              </g>
+              <path d="M287 393 C283 340 290 262 299 214 L319 214 C312 262 318 340 322 393 Z"
+                fill="#8d6e63" stroke="#5d4037" stroke-width="3"/>
+              <path d="M296 380 C294 330 298 270 303 224" stroke="#5d4037" stroke-width="2" fill="none" opacity=".45"/>
+              <path d="M310 372 C308 330 311 275 314 228" stroke="#5d4037" stroke-width="2" fill="none" opacity=".35"/>
+              <path d="M306 218 C324 200 344 190 366 186" stroke="#6d4c41" stroke-width="7" fill="none" stroke-linecap="round"/>
+              <path d="M306 224 C288 206 268 196 246 192" stroke="#6d4c41" stroke-width="7" fill="none" stroke-linecap="round"/>
+              <g class="canopy">
+                <ellipse cx="300" cy="174" rx="80" ry="60" fill="#66bb6a"/>
+                <ellipse cx="242" cy="198" rx="58" ry="46" fill="#43a047"/>
+                <ellipse cx="360" cy="194" rx="61" ry="48" fill="#81c784"/>
+                <ellipse cx="300" cy="132" rx="52" ry="42" fill="#43a047"/>
+                <ellipse cx="260" cy="150" rx="41" ry="32" fill="#a5d6a7"/>
+                <ellipse cx="343" cy="158" rx="43" ry="34" fill="#66bb6a"/>
+                <ellipse cx="300" cy="196" rx="46" ry="30" fill="#81c784" opacity=".8"/>
+              </g>
+              <g id="fx-salt" fill="#ffffff" stroke="#e0f7fa" stroke-width="1">
+                <circle class="crys" cx="272" cy="146" r="3"/>
+                <circle class="crys" cx="296" cy="128" r="2.6"/>
+                <circle class="crys" cx="322" cy="142" r="3"/>
+                <circle class="crys" cx="252" cy="176" r="2.8"/>
+                <circle class="crys" cx="284" cy="166" r="2.4"/>
+                <circle class="crys" cx="310" cy="182" r="3"/>
+                <circle class="crys" cx="338" cy="170" r="2.6"/>
+                <circle class="crys" cx="364" cy="188" r="2.8"/>
+                <circle class="crys" cx="230" cy="200" r="2.5"/>
+                <circle class="crys" cx="356" cy="146" r="2.4"/>
+                <circle class="crys" cx="262" cy="120" r="2.6"/>
+                <circle class="crys" cx="316" cy="116" r="2.5"/>
+              </g>
+              <g id="fx-baby">
+                <path d="M336 200 L336 212" stroke="#6d4c41" stroke-width="2.5"/>
+                <g transform="rotate(12 336 214)">
+                  <rect x="329" y="212" width="14" height="54" rx="7" fill="#9ccc65" stroke="#7cb342" stroke-width="2.5"/>
+                  <circle cx="336" cy="211" r="4.5" fill="#aed581"/>
+                </g>
+              </g>
+              <g id="fx-sprout">
+                <path d="M336 404 C333 396 334 390 336 386" stroke="#558b2f" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+                <ellipse cx="325" cy="388" rx="11" ry="5.5" fill="#66bb6a" transform="rotate(-22 325 388)"/>
+                <ellipse cx="347" cy="388" rx="11" ry="5.5" fill="#81c784" transform="rotate(22 347 388)"/>
+              </g>
+            </g>
+
+            <g id="tideGroup">
+              <path d="M0 305 L900 305 L900 388 L0 388 Z" fill="url(#seaG)"/>
+              <g class="waves">
+                <path d="M0 313 q45 -11 90 0 t90 0 t90 0 t90 0 t90 0 t90 0 t90 0 t90 0 t90 0 t90 0"
+                  stroke="#e1f5fe" stroke-width="4" fill="none" opacity=".75"/>
+                <path d="M900 313 q45 -11 90 0 t90 0 t90 0 t90 0 t90 0 t90 0 t90 0 t90 0 t90 0 t90 0"
+                  stroke="#e1f5fe" stroke-width="4" fill="none" opacity=".75"/>
+              </g>
+              <path d="M0 388 q60 8 120 0 t120 0 t120 0 t120 0 t120 0 t120 0 t120 0 t120 0"
+                stroke="#fff" stroke-width="3" fill="none" opacity=".5"/>
+              <g fill="#e1f5fe" opacity=".85">
+                <circle class="bub" cx="555" cy="300" r="4.5"/>
+                <circle class="bub" cx="572" cy="296" r="3.2"/>
+                <circle class="bub" cx="548" cy="292" r="2.6"/>
+              </g>
+            </g>
+
+            <g class="fallen-leaves">
+              <path d="M396 472 q15 -13 30 0 q-15 13 -30 0" fill="#a1887f"/>
+              <path d="M428 488 q12 -10 24 0 q-12 10 -24 0" fill="#8d6e63"/>
+              <path d="M368 494 q11 -9 22 0 q-11 9 -22 0" fill="#9e9e9e"/>
+            </g>
+
+            <g class="clickable" data-egg="crab" transform="translate(520,498)">
+              <circle class="hs-ring" r="28" fill="none" stroke="#ffffff" stroke-width="3"/>
+              <image class="scene-emoji-img" x="-17" y="-17" width="34" height="34" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGcgc3Ryb2tlPSIjZTUzOTM1IiBzdHJva2Utd2lkdGg9IjMuNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIj4KICAgIDxwYXRoIGQ9Ik0xOCA0MCBMOCA0NiIvPgogICAgPHBhdGggZD0iTTIwIDQ0IEwxMiA1MiIvPgogICAgPHBhdGggZD0iTTQ2IDQwIEw1NiA0NiIvPgogICAgPHBhdGggZD0iTTQ0IDQ0IEw1MiA1MiIvPgogIDwvZz4KICA8ZWxsaXBzZSBjeD0iMzIiIGN5PSIzNiIgcng9IjE3IiByeT0iMTIiIGZpbGw9IiNlZjUzNTAiLz4KICA8ZWxsaXBzZSBjeD0iMzIiIGN5PSI0MiIgcng9IjEwIiByeT0iNSIgZmlsbD0iI2ZmY2RkMiIgb3BhY2l0eT0iLjciLz4KICA8ZyBmaWxsPSIjZWY1MzUwIiBzdHJva2U9IiNlNTM5MzUiIHN0cm9rZS13aWR0aD0iMiI+CiAgICA8Y2lyY2xlIGN4PSIxNCIgY3k9IjI4IiByPSI1LjQiLz4KICAgIDxjaXJjbGUgY3g9IjUwIiBjeT0iMjgiIHI9IjUuNCIvPgogIDwvZz4KICA8ZyBzdHJva2U9IiNlNTM5MzUiIHN0cm9rZS13aWR0aD0iMi42IiBzdHJva2UtbGluZWNhcD0icm91bmQiPgogICAgPHBhdGggZD0iTTI1IDI2IEwyMiAxNiIvPgogICAgPHBhdGggZD0iTTM5IDI2IEw0MiAxNiIvPgogIDwvZz4KICA8Y2lyY2xlIGN4PSIyMS41IiBjeT0iMTQuNSIgcj0iNCIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjZTUzOTM1IiBzdHJva2Utd2lkdGg9IjIiLz4KICA8Y2lyY2xlIGN4PSI0Mi41IiBjeT0iMTQuNSIgcj0iNCIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjZTUzOTM1IiBzdHJva2Utd2lkdGg9IjIiLz4KICA8Y2lyY2xlIGN4PSIyMS41IiBjeT0iMTQuNSIgcj0iMS42IiBmaWxsPSIjMzc0NzRmIi8+CiAgPGNpcmNsZSBjeD0iNDIuNSIgY3k9IjE0LjUiIHI9IjEuNiIgZmlsbD0iIzM3NDc0ZiIvPgogIDxwYXRoIGQ9Ik0yNyA0MCBxNSA0IDEwIDAiIHN0cm9rZT0iI2I3MWMxYyIgc3Ryb2tlLXdpZHRoPSIyLjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4K"/>
+              <title>点击招潮蟹：滩涂小居民</title>
+            </g>
+            <g transform="translate(612,505)">
+              <image class="scene-emoji-img" x="-12" y="-12" width="24" height="24" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHBhdGggZD0iTTMyIDUyIEwxMCA1MCBBMjIgMjIgMCAwIDEgNTQgNTAgWiIgZmlsbD0iI2ZmZDU0ZiIgc3Ryb2tlPSIjZmZiMzAwIiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogIDxnIHN0cm9rZT0iI2Y1N2YxNyIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiPgogICAgPHBhdGggZD0iTTMyIDUyIEwyMCAzNCIvPgogICAgPHBhdGggZD0iTTMyIDUyIEwzMiAzMCIvPgogICAgPHBhdGggZD0iTTMyIDUyIEw0NCAzNCIvPgogIDwvZz4KICA8Y2lyY2xlIGN4PSIzMiIgY3k9IjUyIiByPSIzIiBmaWxsPSIjZjU3ZjE3Ii8+Cjwvc3ZnPgo="/>
+            </g>
+
+            <g transform="translate(600,330)">
+              <g class="fish f1 clickable" data-egg="fish">
+                <circle class="hs-ring" r="25" fill="none" stroke="#ffffff" stroke-width="3"/>
+                <ellipse cx="0" cy="0" rx="17" ry="9" fill="#ffb300"/>
+                <path d="M15 0 L28 -9 L28 9 Z" fill="#ff8f00"/>
+                <circle cx="-7" cy="-2.5" r="2.2" fill="#fff"/>
+                <title>点击小鱼：大海幼儿园</title>
+              </g>
+            </g>
+            <g transform="translate(740,352)">
+              <g class="fish f2">
+                <ellipse cx="0" cy="0" rx="13" ry="7" fill="#ff7043"/>
+                <path d="M12 0 L23 -7 L23 7 Z" fill="#e64a19"/>
+                <circle cx="-5" cy="-2" r="1.8" fill="#fff"/>
+              </g>
+            </g>
+
+            <g class="hs" data-egg="trunk" transform="translate(306,322)">
+              <circle class="hs-ring" r="31" fill="none" stroke="#ffffff" stroke-width="3"/>
+              <circle class="hs-bg" r="24" fill="#ffffff" stroke="#0288d1" stroke-width="3"/>
+              <image class="hs-img" x="-14" y="-14" width="28" height="28" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMjQiIGZpbGw9IiNhMTg4N2YiIHN0cm9rZT0iIzZkNGM0MSIgc3Ryb2tlLXdpZHRoPSIyLjQiLz4KICA8Y2lyY2xlIGN4PSIzMiIgY3k9IjMyIiByPSIxNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjOGQ2ZTYzIiBzdHJva2Utd2lkdGg9IjIuMiIvPgogIDxjaXJjbGUgY3g9IjMyIiBjeT0iMzIiIHI9IjkiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzhkNmU2MyIgc3Ryb2tlLXdpZHRoPSIyLjIiLz4KICA8Y2lyY2xlIGN4PSIzMiIgY3k9IjMyIiByPSIzLjQiIGZpbGw9IiM1ZDQwMzciLz4KPC9zdmc+Cg=="/>
+              <text class="hs-label" y="47" font-size="15" font-weight="800" text-anchor="middle">树干 · 名字的秘密</text>
+              <title>点击树干：红树名字的由来</title>
+            </g>
+            <g class="hs" data-egg="leaves" transform="translate(415,483)">
+              <circle class="hs-ring" r="31" fill="none" stroke="#ffffff" stroke-width="3"/>
+              <circle class="hs-bg" r="24" fill="#ffffff" stroke="#7cb342" stroke-width="3"/>
+              <image class="hs-img" x="-14" y="-14" width="28" height="28" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHBhdGggZD0iTTEyIDUyIFEgMjggMzAgNTIgMTIgUSAzMiAzMiAxMiA1MiBaIiBmaWxsPSIjYTE4ODdmIiBzdHJva2U9IiM2ZDRjNDEiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgPHBhdGggZD0iTTEyIDUyIEwgNDYgMTgiIHN0cm9rZT0iIzZkNGM0MSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8cGF0aCBkPSJNMTIgNTIgQzEyIDU2IDE0IDU4IDE4IDU4IiBzdHJva2U9IiM2ZDRjNDEiIHN0cm9rZS13aWR0aD0iMi42IiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9zdmc+Cg=="/>
+              <text class="hs-label" y="47" font-size="15" font-weight="800" text-anchor="middle">落叶 · 大海的食物</text>
+              <title>点击落叶：大海的“食物工厂”</title>
+            </g>
+            <g class="hs" data-egg="warn" transform="translate(72,60)">
+              <circle class="hs-ring" r="31" fill="none" stroke="#ffffff" stroke-width="3"/>
+              <circle class="hs-bg" r="24" fill="#ffffff" stroke="#e53935" stroke-width="3"/>
+              <image class="hs-img" x="-14" y="-14" width="28" height="28" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHBhdGggZD0iTTMyIDggTDU4IDU0IEg2IFoiIGZpbGw9IiNmZmQ1NGYiIHN0cm9rZT0iI2ZmYjMwMCIgc3Ryb2tlLXdpZHRoPSIyLjYiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8cmVjdCB4PSIyOC44IiB5PSIyNCIgd2lkdGg9IjYuNCIgaGVpZ2h0PSIxNyIgcng9IjMuMiIgZmlsbD0iIzVkNDAzNyIvPgogIDxjaXJjbGUgY3g9IjMyIiBjeT0iNDciIHI9IjMuOCIgZmlsbD0iIzVkNDAzNyIvPgo8L3N2Zz4K"/>
+              <text class="hs-label" y="47" font-size="15" font-weight="800" text-anchor="middle">红树林的危机</text>
+              <title>点击警告图标：红树林的危机</title>
+            </g>
+            <g class="hs locked" id="hs-family" data-egg="family" transform="translate(268,118)">
+              <circle class="hs-ring" r="31" fill="none" stroke="#ffffff" stroke-width="3"/>
+              <circle class="hs-bg" r="24" fill="#ffffff" stroke="#8d6e63" stroke-width="3"/>
+              <image class="hs-img" id="hs-family-img" x="-14" y="-14" width="28" height="28" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHBhdGggZD0iTTIyIDI4IHYtNSBhMTAgMTAgMCAwIDEgMjAgMCB2NSIgc3Ryb2tlPSIjNmQ0YzQxIiBzdHJva2Utd2lkdGg9IjUiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxyZWN0IHg9IjE2IiB5PSIyNyIgd2lkdGg9IjMyIiBoZWlnaHQ9IjI2IiByeD0iNyIgZmlsbD0iI2ZmYjMwMCIgc3Ryb2tlPSIjZjU3ZjE3IiBzdHJva2Utd2lkdGg9IjIuMiIvPgogIDxjaXJjbGUgY3g9IjMyIiBjeT0iMzciIHI9IjQuMiIgZmlsbD0iIzVkNDAzNyIvPgogIDxyZWN0IHg9IjMwLjIiIHk9IjM5IiB3aWR0aD0iMy42IiBoZWlnaHQ9IjgiIHJ4PSIxLjgiIGZpbGw9IiM1ZDQwMzciLz4KPC9zdmc+Cg=="/>
+              <text class="hs-label" y="47" font-size="15" font-weight="800" text-anchor="middle">完成挑战后解锁</text>
+              <title>认识红树家族：完成全部挑战后解锁</title>
+            </g>
+            <g class="hs" data-egg="mud" transform="translate(567,428)">
+              <circle class="hs-ring" r="31" fill="none" stroke="#ffffff" stroke-width="3"/>
+              <circle class="hs-bg" r="24" fill="#ffffff" stroke="#6d4c41" stroke-width="3"/>
+              <image class="hs-img" x="-14" y="-14" width="28" height="28" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHBhdGggZD0iTTYgNTAgUTE4IDM0IDMyIDM4IFE0NiAzMiA1OCA1MCBaIiBmaWxsPSIjOGQ2ZTYzIiBzdHJva2U9IiM1ZDQwMzciIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogIDxjaXJjbGUgY3g9IjQyIiBjeT0iMjIiIHI9IjkiIGZpbGw9IiNmZmYiIHN0cm9rZT0iIzRmYzNmNyIgc3Ryb2tlLXdpZHRoPSIyLjIiLz4KICA8cGF0aCBkPSJNMTIgMjQgUTIwIDE0IDMwIDE4IFEyNiAyOCAxMiAyNCBaIiBmaWxsPSIjNjZiYjZhIi8+Cjwvc3ZnPgo="/>
+              <text class="hs-label" y="47" font-size="15" font-weight="800" text-anchor="middle">滩涂 · 蓝碳仓库</text>
+              <title>点击滩涂：会“锁碳”的蓝碳仓库</title>
+            </g>
+          </svg>
+
+          <div class="tide-switch">
+            <button class="tide-btn active" id="tideHigh" type="button"><img class="ic" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHBhdGggZD0iTTYgMjQgcTggLTkgMTYgMCB0MTYgMCB0MTYgMCIgc3Ryb2tlPSIjNGZjM2Y3IiBzdHJva2Utd2lkdGg9IjUuNCIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPHBhdGggZD0iTTYgNDAgcTggLTkgMTYgMCB0MTYgMCB0MTYgMCIgc3Ryb2tlPSIjMDI4OGQxIiBzdHJva2Utd2lkdGg9IjUuNCIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPGNpcmNsZSBjeD0iNTAiIGN5PSIxNCIgcj0iMyIgZmlsbD0iIzgxZDRmYSIvPgogIDxjaXJjbGUgY3g9IjE0IiBjeT0iNTQiIHI9IjMuNCIgZmlsbD0iIzRmYzNmNyIvPgo8L3N2Zz4K" alt="">涨潮</button>
+            <button class="tide-btn" id="tideLow" type="button"><img class="ic" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHBhdGggZD0iTTMyIDEwIGMxNSAwIDI0IDEwIDI0IDE5IGgtNDggYzAgLTkgOSAtMTkgMjQgLTE5IHoiIGZpbGw9IiNmZjcwNDMiLz4KICA8cGF0aCBkPSJNMzIgMTAgYzggMCAxMyA1IDE1IDExIGgtMTUgeiIgZmlsbD0iI2ZmZTBiMiIgb3BhY2l0eT0iLjg1Ii8+CiAgPHBhdGggZD0iTTMyIDEwIGMtOCAwIC0xMyA1IC0xNSAxMSBoMTUgeiIgZmlsbD0iI2ZmZTBiMiIgb3BhY2l0eT0iLjU1Ii8+CiAgPHBhdGggZD0iTTMyIDI5IHYyNSIgc3Ryb2tlPSIjNmQ0YzQxIiBzdHJva2Utd2lkdGg9IjMuNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPHBhdGggZD0iTTggNTYgcTI0IC04IDQ4IDAiIHN0cm9rZT0iI2ZmZDU0ZiIgc3Ryb2tlLXdpZHRoPSI1IiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9zdmc+Cg==" alt="">退潮</button>
+          </div>
+
+          <div class="scene-toast" id="sceneToast"></div>
+
+          <div class="scene-intro" id="sceneIntro">
+            <img class="si-emoji-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGcgdHJhbnNmb3JtPSJyb3RhdGUoMTggMzIgMzQpIj4KICAgIDxyZWN0IHg9IjI2IiB5PSIxNiIgd2lkdGg9IjEyIiBoZWlnaHQ9IjM2IiByeD0iNiIgZmlsbD0iIzljY2M2NSIgc3Ryb2tlPSIjN2NiMzQyIiBzdHJva2Utd2lkdGg9IjIuMiIvPgogICAgPGNpcmNsZSBjeD0iMzIiIGN5PSIxNSIgcj0iNCIgZmlsbD0iI2FlZDU4MSIvPgogIDwvZz4KICA8cGF0aCBkPSJNNDQgMjAgYzYgLTYgMTIgLTYgMTQgLTIgLTIgNiAtOCA4IC0xNCA0IHoiIGZpbGw9IiM2NmJiNmEiLz4KICA8cGF0aCBkPSJNMTggNTAgYzIgNCA2IDYgMTAgNiIgc3Ryb2tlPSIjNTU4YjJmIiBzdHJva2Utd2lkdGg9IjIuNiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPHJlY3QgeD0iMTAiIHk9IjU0IiB3aWR0aD0iNDQiIGhlaWdodD0iNiIgcng9IjMiIGZpbGw9IiM4ZDZlNjMiLz4KPC9zdmc+Cg==" alt="">
+            <h2>小红树求生记</h2>
+            <p>你是一棵落在潮间带滩涂上的小红树。这里有五重生存考验——鼓起勇气，解锁红树的超能力法宝！答题时也可以按键盘 1 / 2 / 3 快选哦。</p>
+            <button class="btn btn-primary" id="startBtn"><img class="ic" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHBhdGggZD0iTTMyIDQgYzkgOSAxMiAyMCAxMiAzMCBoLTI0IGMwIC0xMCAzIC0yMSAxMiAtMzAgeiIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjOTBhNGFlIiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogIDxjaXJjbGUgY3g9IjMyIiBjeT0iMjQiIHI9IjUuNCIgZmlsbD0iIzRmYzNmNyIgc3Ryb2tlPSIjMDI4OGQxIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8cGF0aCBkPSJNMjAgMzAgYy02IDQgLTggMTAgLTcgMTYgbDcgLTcgeiIgZmlsbD0iI2U1MzkzNSIvPgogIDxwYXRoIGQ9Ik00NCAzMCBjNiA0IDggMTAgNyAxNiBsLTcgLTcgeiIgZmlsbD0iI2U1MzkzNSIvPgogIDxwYXRoIGQ9Ik0yNiAzOCBoMTIgbC02IDE0IHoiIGZpbGw9IiNmZmIzMDAiLz4KICA8cGF0aCBkPSJNMjkgNDAgaDYgbC0zIDggeiIgZmlsbD0iI2ZmZDU0ZiIvPgo8L3N2Zz4K" alt="">开始冒险</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card table-card" id="tableCard">
+        <div class="tc-head"><h2>生存对比表：普通植物 vs 红树植物</h2></div>
+        <div class="tc-note">每通过一个挑战，对应的一行就会浮现出来——看看红树的“超能力”到底解决了什么问题。</div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr><th>生存挑战</th><th><img class="ic" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHBhdGggZD0iTTMyIDUyIFYyOCIgc3Ryb2tlPSIjN2NiMzQyIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMiAzNCBDMjIgMzIgMTYgMjYgMTYgMTggQzI2IDE4IDMyIDI0IDMyIDM0IFoiIGZpbGw9IiNhZWQ1ODEiLz4KICA8cGF0aCBkPSJNMzIgMzAgQzQyIDI4IDQ4IDIyIDQ4IDE0IEMzOCAxNCAzMiAyMCAzMiAzMCBaIiBmaWxsPSIjYzVlMWE1Ii8+CiAgPHJlY3QgeD0iMTIiIHk9IjUyIiB3aWR0aD0iNDAiIGhlaWdodD0iNiIgcng9IjMiIGZpbGw9IiNiMGJlYzUiLz4KPC9zdmc+Cg==" alt="">普通植物</th><th><img class="ic" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGNpcmNsZSBjeD0iMzIiIGN5PSIyMCIgcj0iMTUiIGZpbGw9IiM0M2EwNDciLz4KICA8Y2lyY2xlIGN4PSIyNSIgY3k9IjE2IiByPSI1IiBmaWxsPSIjNjZiYjZhIi8+CiAgPHJlY3QgeD0iMjkiIHk9IjMwIiB3aWR0aD0iNiIgaGVpZ2h0PSIxOCIgcng9IjIiIGZpbGw9IiM2ZDRjNDEiLz4KICA8ZyBzdHJva2U9IiM2ZDRjNDEiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIj4KICAgIDxwYXRoIGQ9Ik0yOSA0NiBDMjQgNTAgMjAgNTIgMTQgNTQiLz4KICAgIDxwYXRoIGQ9Ik0zNSA0NiBDNDAgNTAgNDQgNTIgNTAgNTQiLz4KICAgIDxwYXRoIGQ9Ik0zMiA0NyBDMzIgNTEgMzEgNTMgMjkgNTYiLz4KICA8L2c+CiAgPHJlY3QgeD0iNiIgeT0iNTUiIHdpZHRoPSI1MiIgaGVpZ2h0PSI2IiByeD0iMyIgZmlsbD0iI2ExODg3ZiIvPgo8L3N2Zz4K" alt="">红树植物</th></tr>
+            </thead>
+            <tbody>
+              <tr class="row locked" id="row-salt">
+                <td class="c-name"><img class="ic" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHJlY3QgeD0iMjIiIHk9IjI0IiB3aWR0aD0iMjAiIGhlaWdodD0iMzAiIHJ4PSI2IiBmaWxsPSIjNGZjM2Y3IiBzdHJva2U9IiMwMjg4ZDEiIHN0cm9rZS13aWR0aD0iMi41Ii8+CiAgPHJlY3QgeD0iMjUiIHk9IjE2IiB3aWR0aD0iMTQiIGhlaWdodD0iOSIgcng9IjMuNSIgZmlsbD0iIzAyODhkMSIvPgogIDxjaXJjbGUgY3g9IjI5IiBjeT0iMjAuNSIgcj0iMS42IiBmaWxsPSIjZTFmNWZlIi8+CiAgPGNpcmNsZSBjeD0iMzUiIGN5PSIyMC41IiByPSIxLjYiIGZpbGw9IiNlMWY1ZmUiLz4KICA8Y2lyY2xlIGN4PSIzMiIgY3k9IjIwLjUiIHI9IjEuNiIgZmlsbD0iI2UxZjVmZSIvPgogIDxwYXRoIGQ9Ik00NiAyMiBsNCA0IC00IDQgLTQgLTQgeiIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjNGZjM2Y3IiBzdHJva2Utd2lkdGg9IjIiLz4KICA8cGF0aCBkPSJNNTAgMzQgbDMgMyAtMyAzIC0zIC0zIHoiIGZpbGw9IiNlMWY1ZmUiIHN0cm9rZT0iIzRmYzNmNyIgc3Ryb2tlLXdpZHRoPSIxLjYiLz4KICA8cGF0aCBkPSJNNDIgNDIgbDIuNiAyLjYgLTIuNiAyLjYgLTIuNiAtMi42IHoiIGZpbGw9IiNmZmYiIHN0cm9rZT0iIzRmYzNmNyIgc3Ryb2tlLXdpZHRoPSIxLjYiLz4KPC9zdmc+Cg==" alt="">高盐海水</td>
+                <td class="c-normal">完成挑战后揭晓</td>
+                <td class="c-mangrove">完成挑战后揭晓</td>
+              </tr>
+              <tr class="row locked" id="row-oxygen">
+                <td class="c-name"><img class="ic" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHJlY3QgeD0iNiIgeT0iNTIiIHdpZHRoPSI1MiIgaGVpZ2h0PSI4IiByeD0iNCIgZmlsbD0iIzhkNmU2MyIvPgogIDxyZWN0IHg9IjI5IiB5PSIzMCIgd2lkdGg9IjYiIGhlaWdodD0iMjQiIHJ4PSIzIiBmaWxsPSIjYTE4ODdmIiBzdHJva2U9IiM2ZDRjNDEiIHN0cm9rZS13aWR0aD0iMS42Ii8+CiAgPGNpcmNsZSBjeD0iMTkiIGN5PSIyNiIgcj0iNiIgZmlsbD0iIzRmYzNmNyIvPgogIDxjaXJjbGUgY3g9IjE3IiBjeT0iMjQiIHI9IjEuOCIgZmlsbD0iI2ZmZiIvPgogIDxjaXJjbGUgY3g9IjQ2IiBjeT0iMTgiIHI9IjciIGZpbGw9IiM4MWQ0ZmEiLz4KICA8Y2lyY2xlIGN4PSI0My42IiBjeT0iMTUuNiIgcj0iMiIgZmlsbD0iI2ZmZiIvPgogIDxjaXJjbGUgY3g9IjQyIiBjeT0iMzYiIHI9IjQuNSIgZmlsbD0iIzRmYzNmNyIvPgogIDxjaXJjbGUgY3g9IjQwLjYiIGN5PSIzNC42IiByPSIxLjQiIGZpbGw9IiNmZmYiLz4KPC9zdmc+Cg==" alt="">缺氧淤泥</td>
+                <td class="c-normal">完成挑战后揭晓</td>
+                <td class="c-mangrove">完成挑战后揭晓</td>
+              </tr>
+              <tr class="row locked" id="row-baby">
+                <td class="c-name"><img class="ic" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGcgdHJhbnNmb3JtPSJyb3RhdGUoMTggMzIgMzQpIj4KICAgIDxyZWN0IHg9IjI2IiB5PSIxNiIgd2lkdGg9IjEyIiBoZWlnaHQ9IjM2IiByeD0iNiIgZmlsbD0iIzljY2M2NSIgc3Ryb2tlPSIjN2NiMzQyIiBzdHJva2Utd2lkdGg9IjIuMiIvPgogICAgPGNpcmNsZSBjeD0iMzIiIGN5PSIxNSIgcj0iNCIgZmlsbD0iI2FlZDU4MSIvPgogIDwvZz4KICA8cGF0aCBkPSJNNDQgMjAgYzYgLTYgMTIgLTYgMTQgLTIgLTIgNiAtOCA4IC0xNCA0IHoiIGZpbGw9IiM2NmJiNmEiLz4KICA8cGF0aCBkPSJNMTggNTAgYzIgNCA2IDYgMTAgNiIgc3Ryb2tlPSIjNTU4YjJmIiBzdHJva2Utd2lkdGg9IjIuNiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPHJlY3QgeD0iMTAiIHk9IjU0IiB3aWR0aD0iNDQiIGhlaWdodD0iNiIgcng9IjMiIGZpbGw9IiM4ZDZlNjMiLz4KPC9zdmc+Cg==" alt="">潮水冲刷</td>
+                <td class="c-normal">完成挑战后揭晓</td>
+                <td class="c-mangrove">完成挑战后揭晓</td>
+              </tr>
+              <tr class="row locked" id="row-root">
+                <td class="c-name"><img class="ic" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGNpcmNsZSBjeD0iMzIiIGN5PSIyMCIgcj0iMTUiIGZpbGw9IiM0M2EwNDciLz4KICA8Y2lyY2xlIGN4PSIyNSIgY3k9IjE2IiByPSI1IiBmaWxsPSIjNjZiYjZhIi8+CiAgPHJlY3QgeD0iMjkiIHk9IjMwIiB3aWR0aD0iNiIgaGVpZ2h0PSIxOCIgcng9IjIiIGZpbGw9IiM2ZDRjNDEiLz4KICA8ZyBzdHJva2U9IiM2ZDRjNDEiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIj4KICAgIDxwYXRoIGQ9Ik0yOSA0NiBDMjQgNTAgMjAgNTIgMTQgNTQiLz4KICAgIDxwYXRoIGQ9Ik0zNSA0NiBDNDAgNTAgNDQgNTIgNTAgNTQiLz4KICAgIDxwYXRoIGQ9Ik0zMiA0NyBDMzIgNTEgMzEgNTMgMjkgNTYiLz4KICA8L2c+CiAgPHJlY3QgeD0iNiIgeT0iNTUiIHdpZHRoPSI1MiIgaGVpZ2h0PSI2IiByeD0iMyIgZmlsbD0iI2ExODg3ZiIvPgo8L3N2Zz4K" alt="">台风巨浪</td>
+                <td class="c-normal">完成挑战后揭晓</td>
+                <td class="c-mangrove">完成挑战后揭晓</td>
+              </tr>
+              <tr class="row locked" id="row-clean">
+                <td class="c-name"><img class="ic" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHBhdGggZD0iTTMyIDYgQzMyIDYgNDggMjggNDggMzkgYTE2IDE2IDAgMSAxIC0zMiAwIEMxNiAyOCAzMiA2IDMyIDYgWiIgZmlsbD0iIzRmYzNmNyIgc3Ryb2tlPSIjMDI4OGQxIiBzdHJva2Utd2lkdGg9IjIuMiIvPgogIDxwYXRoIGQ9Ik0yNSAzNiBhOCA4IDAgMCAxIDQgLTgiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8cGF0aCBkPSJNNTIgMTIgbDIuNCAyLjQgLTIuNCAyLjQgLTIuNCAtMi40IHoiIGZpbGw9IiNmZmQ1NGYiLz4KICA8cGF0aCBkPSJNMTIgMTYgbDEuOCAxLjggLTEuOCAxLjggLTEuOCAtMS44IHoiIGZpbGw9IiNmZmQ1NGYiLz4KPC9zdmc+Cg==" alt="">浑浊污水</td>
+                <td class="c-normal">完成挑战后揭晓</td>
+                <td class="c-mangrove">完成挑战后揭晓</td>
+              </tr>
+              <tr class="row result locked" id="row-result">
+                <td class="c-name">最终结果</td>
+                <td class="c-normal">完成挑战后揭晓</td>
+                <td class="c-mangrove">完成挑战后揭晓</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="tc-tip"><img class="ic" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGNpcmNsZSBjeD0iMjQiIGN5PSIxOCIgcj0iOCIgZmlsbD0iI2ZmZTBiMiIgc3Ryb2tlPSIjZTBhYzY5IiBzdHJva2Utd2lkdGg9IjIiLz4KICA8cGF0aCBkPSJNMTIgNTQgYzAgLTEzIDUgLTIwIDEyIC0yMCBzMTIgNyAxMiAyMCB6IiBmaWxsPSIjMDI4OGQxIi8+CiAgPHBhdGggZD0iTTM0IDM0IEw1MCAyMiIgc3Ryb2tlPSIjNmQ0YzQxIiBzdHJva2Utd2lkdGg9IjMuNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPGNpcmNsZSBjeD0iNTEiIGN5PSIyMSIgcj0iMy40IiBmaWxsPSIjZTUzOTM1Ii8+Cjwvc3ZnPgo=" alt="">课堂小玩法：可以把五个挑战分配给五个小组，比一比哪一组能帮小红树最先集齐全部超能力！</div>
+      </section>
+    </div>
+
+    <div class="col-right">
+      <section class="card panel-card" id="panelCard">
+        <div class="pills">
+          <div class="pill" id="pill-salt"><img class="ic" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHJlY3QgeD0iMjIiIHk9IjI0IiB3aWR0aD0iMjAiIGhlaWdodD0iMzAiIHJ4PSI2IiBmaWxsPSIjNGZjM2Y3IiBzdHJva2U9IiMwMjg4ZDEiIHN0cm9rZS13aWR0aD0iMi41Ii8+CiAgPHJlY3QgeD0iMjUiIHk9IjE2IiB3aWR0aD0iMTQiIGhlaWdodD0iOSIgcng9IjMuNSIgZmlsbD0iIzAyODhkMSIvPgogIDxjaXJjbGUgY3g9IjI5IiBjeT0iMjAuNSIgcj0iMS42IiBmaWxsPSIjZTFmNWZlIi8+CiAgPGNpcmNsZSBjeD0iMzUiIGN5PSIyMC41IiByPSIxLjYiIGZpbGw9IiNlMWY1ZmUiLz4KICA8Y2lyY2xlIGN4PSIzMiIgY3k9IjIwLjUiIHI9IjEuNiIgZmlsbD0iI2UxZjVmZSIvPgogIDxwYXRoIGQ9Ik00NiAyMiBsNCA0IC00IDQgLTQgLTQgeiIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjNGZjM2Y3IiBzdHJva2Utd2lkdGg9IjIiLz4KICA8cGF0aCBkPSJNNTAgMzQgbDMgMyAtMyAzIC0zIC0zIHoiIGZpbGw9IiNlMWY1ZmUiIHN0cm9rZT0iIzRmYzNmNyIgc3Ryb2tlLXdpZHRoPSIxLjYiLz4KICA8cGF0aCBkPSJNNDIgNDIgbDIuNiAyLjYgLTIuNiAyLjYgLTIuNiAtMi42IHoiIGZpbGw9IiNmZmYiIHN0cm9rZT0iIzRmYzNmNyIgc3Ryb2tlLXdpZHRoPSIxLjYiLz4KPC9zdmc+Cg==" alt=""><span>泌盐</span><span class="p-st">未解锁</span></div>
+          <div class="pill" id="pill-oxygen"><img class="ic" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHJlY3QgeD0iNiIgeT0iNTIiIHdpZHRoPSI1MiIgaGVpZ2h0PSI4IiByeD0iNCIgZmlsbD0iIzhkNmU2MyIvPgogIDxyZWN0IHg9IjI5IiB5PSIzMCIgd2lkdGg9IjYiIGhlaWdodD0iMjQiIHJ4PSIzIiBmaWxsPSIjYTE4ODdmIiBzdHJva2U9IiM2ZDRjNDEiIHN0cm9rZS13aWR0aD0iMS42Ii8+CiAgPGNpcmNsZSBjeD0iMTkiIGN5PSIyNiIgcj0iNiIgZmlsbD0iIzRmYzNmNyIvPgogIDxjaXJjbGUgY3g9IjE3IiBjeT0iMjQiIHI9IjEuOCIgZmlsbD0iI2ZmZiIvPgogIDxjaXJjbGUgY3g9IjQ2IiBjeT0iMTgiIHI9IjciIGZpbGw9IiM4MWQ0ZmEiLz4KICA8Y2lyY2xlIGN4PSI0My42IiBjeT0iMTUuNiIgcj0iMiIgZmlsbD0iI2ZmZiIvPgogIDxjaXJjbGUgY3g9IjQyIiBjeT0iMzYiIHI9IjQuNSIgZmlsbD0iIzRmYzNmNyIvPgogIDxjaXJjbGUgY3g9IjQwLjYiIGN5PSIzNC42IiByPSIxLjQiIGZpbGw9IiNmZmYiLz4KPC9zdmc+Cg==" alt=""><span>呼吸根</span><span class="p-st">未解锁</span></div>
+          <div class="pill" id="pill-baby"><img class="ic" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGcgdHJhbnNmb3JtPSJyb3RhdGUoMTggMzIgMzQpIj4KICAgIDxyZWN0IHg9IjI2IiB5PSIxNiIgd2lkdGg9IjEyIiBoZWlnaHQ9IjM2IiByeD0iNiIgZmlsbD0iIzljY2M2NSIgc3Ryb2tlPSIjN2NiMzQyIiBzdHJva2Utd2lkdGg9IjIuMiIvPgogICAgPGNpcmNsZSBjeD0iMzIiIGN5PSIxNSIgcj0iNCIgZmlsbD0iI2FlZDU4MSIvPgogIDwvZz4KICA8cGF0aCBkPSJNNDQgMjAgYzYgLTYgMTIgLTYgMTQgLTIgLTIgNiAtOCA4IC0xNCA0IHoiIGZpbGw9IiM2NmJiNmEiLz4KICA8cGF0aCBkPSJNMTggNTAgYzIgNCA2IDYgMTAgNiIgc3Ryb2tlPSIjNTU4YjJmIiBzdHJva2Utd2lkdGg9IjIuNiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPHJlY3QgeD0iMTAiIHk9IjU0IiB3aWR0aD0iNDQiIGhlaWdodD0iNiIgcng9IjMiIGZpbGw9IiM4ZDZlNjMiLz4KPC9zdmc+Cg==" alt=""><span>胎生</span><span class="p-st">未解锁</span></div>
+          <div class="pill" id="pill-root"><img class="ic" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGNpcmNsZSBjeD0iMzIiIGN5PSIyMCIgcj0iMTUiIGZpbGw9IiM0M2EwNDciLz4KICA8Y2lyY2xlIGN4PSIyNSIgY3k9IjE2IiByPSI1IiBmaWxsPSIjNjZiYjZhIi8+CiAgPHJlY3QgeD0iMjkiIHk9IjMwIiB3aWR0aD0iNiIgaGVpZ2h0PSIxOCIgcng9IjIiIGZpbGw9IiM2ZDRjNDEiLz4KICA8ZyBzdHJva2U9IiM2ZDRjNDEiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIj4KICAgIDxwYXRoIGQ9Ik0yOSA0NiBDMjQgNTAgMjAgNTIgMTQgNTQiLz4KICAgIDxwYXRoIGQ9Ik0zNSA0NiBDNDAgNTAgNDQgNTIgNTAgNTQiLz4KICAgIDxwYXRoIGQ9Ik0zMiA0NyBDMzIgNTEgMzEgNTMgMjkgNTYiLz4KICA8L2c+CiAgPHJlY3QgeD0iNiIgeT0iNTUiIHdpZHRoPSI1MiIgaGVpZ2h0PSI2IiByeD0iMyIgZmlsbD0iI2ExODg3ZiIvPgo8L3N2Zz4K" alt=""><span>抗浪</span><span class="p-st">未解锁</span></div>
+          <div class="pill" id="pill-clean"><img class="ic" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHBhdGggZD0iTTMyIDYgQzMyIDYgNDggMjggNDggMzkgYTE2IDE2IDAgMSAxIC0zMiAwIEMxNiAyOCAzMiA2IDMyIDYgWiIgZmlsbD0iIzRmYzNmNyIgc3Ryb2tlPSIjMDI4OGQxIiBzdHJva2Utd2lkdGg9IjIuMiIvPgogIDxwYXRoIGQ9Ik0yNSAzNiBhOCA4IDAgMCAxIDQgLTgiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8cGF0aCBkPSJNNTIgMTIgbDIuNCAyLjQgLTIuNCAyLjQgLTIuNCAtMi40IHoiIGZpbGw9IiNmZmQ1NGYiLz4KICA8cGF0aCBkPSJNMTIgMTYgbDEuOCAxLjggLTEuOCAxLjggLTEuOCAtMS44IHoiIGZpbGw9IiNmZmQ1NGYiLz4KPC9zdmc+Cg==" alt=""><span>净化</span><span class="p-st">未解锁</span></div>
+        </div>
+
+        <div id="challengeCard">
+          <div class="ch-head">
+            <span class="ch-no" id="chNo">第 1 / 5 关</span>
+            <span class="ch-title" id="chTitle"></span>
+          </div>
+          <img class="ch-emoji-img" id="chEmoji" alt="">
+          <p class="ch-scenario" id="chScenario"></p>
+          <div class="options" id="optionsEl"></div>
+          <button class="hint-btn" id="hintBtn"><img class="ic" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGNpcmNsZSBjeD0iMzIiIGN5PSIyNiIgcj0iMTQiIGZpbGw9IiNmZmQ1NGYiIHN0cm9rZT0iI2ZmYjMwMCIgc3Ryb2tlLXdpZHRoPSIyLjQiLz4KICA8cGF0aCBkPSJNMjYgMzkgaDEyIHY2IGgtMTIgeiIgZmlsbD0iIzkwYTRhZSIvPgogIDxwYXRoIGQ9Ik0yNyA0OCBoMTAgdjQgYTIgMiAwIDAgMSAtMiAyIGgtNiBhMiAyIDAgMCAxIC0yIC0yIHoiIGZpbGw9IiM3ODkwOWMiLz4KICA8cGF0aCBkPSJNMzIgNiB2NCBNMTIgMTIgbDMgMyBNNTIgMTIgbC0zIDMiIHN0cm9rZT0iI2ZmYjMwMCIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8cGF0aCBkPSJNMjcgMjQgYTYgNiAwIDAgMSA1IC00IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMi42IiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9zdmc+Cg==" alt="">提示</button>
+          <div class="hint-box" id="hintBox" hidden></div>
+          <div class="feedback" id="feedback" hidden></div>
+        </div>
+
+        <div class="win-panel" id="winPanel" hidden>
+          <img class="wp-emoji-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHBhdGggZD0iTTIwIDEwIGgyNCB2OSBhMTIgMTIgMCAwIDEgLTI0IDAgeiIgZmlsbD0iI2ZmZDU0ZiIgc3Ryb2tlPSIjZmZiMzAwIiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogIDxnIHN0cm9rZT0iI2ZmYjMwMCIgc3Ryb2tlLXdpZHRoPSIzLjQiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCI+CiAgICA8cGF0aCBkPSJNMjAgMTQgaC02IGE4IDggMCAwIDAgOCA4Ii8+CiAgICA8cGF0aCBkPSJNNDQgMTQgaDYgYTggOCAwIDAgMSAtOCA4Ii8+CiAgPC9nPgogIDxyZWN0IHg9IjI5IiB5PSIzMSIgd2lkdGg9IjYiIGhlaWdodD0iOSIgZmlsbD0iI2ZmYjMwMCIvPgogIDxyZWN0IHg9IjIzIiB5PSI0MCIgd2lkdGg9IjE4IiBoZWlnaHQ9IjYiIHJ4PSIyIiBmaWxsPSIjNmQ0YzQxIi8+CiAgPHJlY3QgeD0iMTkiIHk9IjQ4IiB3aWR0aD0iMjYiIGhlaWdodD0iNiIgcng9IjIuNiIgZmlsbD0iIzhkNmU2MyIvPgogIDxjaXJjbGUgY3g9IjMyIiBjeT0iMTgiIHI9IjMuNCIgZmlsbD0iI2ZmZiIvPgo8L3N2Zz4K" alt="">
+          <h3>潮间带生存大师！</h3>
+          <p>小红树集齐了全部超能力法宝，成功在潮间带安了家。</p>
+          <div class="win-actions">
+            <button class="btn btn-primary" id="certBtn"><img class="ic" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHJlY3QgeD0iMTIiIHk9IjgiIHdpZHRoPSI0MCIgaGVpZ2h0PSIzNiIgcng9IjQiIGZpbGw9IiNmZmYiIHN0cm9rZT0iIzkwYTRhZSIgc3Ryb2tlLXdpZHRoPSIyLjIiLz4KICA8ZyBmaWxsPSIjYjNlNWZjIj4KICAgIDxyZWN0IHg9IjE5IiB5PSIxNiIgd2lkdGg9IjI2IiBoZWlnaHQ9IjQiIHJ4PSIyIi8+CiAgICA8cmVjdCB4PSIxOSIgeT0iMjQiIHdpZHRoPSIyNiIgaGVpZ2h0PSI0IiByeD0iMiIvPgogICAgPHJlY3QgeD0iMTkiIHk9IjMyIiB3aWR0aD0iMTYiIGhlaWdodD0iNCIgcng9IjIiLz4KICA8L2c+CiAgPHBhdGggZD0iTTI0IDQyIGw4IDEwIDggLTEwIC04IC0zIHoiIGZpbGw9IiNlNTM5MzUiLz4KICA8Y2lyY2xlIGN4PSIzMiIgY3k9IjQ4IiByPSI3IiBmaWxsPSIjNDNhMDQ3IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIvPgogIDxwYXRoIGQ9Ik0yOC42IDQ4IGwyLjYgMi42IDUgLTUuNCIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIuNCIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjwvc3ZnPgo=" alt="">查看生存证书</button>
+            <button class="btn btn-sun" id="familyBtn"><img class="ic" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGNpcmNsZSBjeD0iMzIiIGN5PSIyMiIgcj0iMTYiIGZpbGw9IiM2NmJiNmEiLz4KICA8Y2lyY2xlIGN4PSIyNCIgY3k9IjE3IiByPSI1IiBmaWxsPSIjYTVkNmE3Ii8+CiAgPHJlY3QgeD0iMjkiIHk9IjM0IiB3aWR0aD0iNiIgaGVpZ2h0PSIxOCIgcng9IjIuNCIgZmlsbD0iIzZkNGM0MSIvPgogIDxyZWN0IHg9IjgiIHk9IjU0IiB3aWR0aD0iNDgiIGhlaWdodD0iNyIgcng9IjMuNSIgZmlsbD0iI2ExODg3ZiIvPgo8L3N2Zz4K" alt="">认识红树家族</button>
+            <button class="btn btn-ghost" id="againBtn"><img class="ic" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHBhdGggZD0iTTUyIDMyIGEyMCAyMCAwIDEgMSAtNiAtMTQuNCIgc3Ryb2tlPSIjMDI4OGQxIiBzdHJva2Utd2lkdGg9IjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01MiA4IHYxMiBoLTEyIHoiIGZpbGw9IiMwMjg4ZDEiLz4KPC9zdmc+Cg==" alt="">再玩一次</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    科普数据参考：自然资源部 · 国家林业和草原局 · 广西壮族自治区林业局等公开资料（2020—2026）｜ 适合 6–12 岁学生课堂与家庭互动
+  </footer>
+</div>
+
+<div class="mask" id="mask" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <button class="modal-close" id="modalClose" aria-label="关闭">✕</button>
+    <img class="modal-emoji-img" id="mEmoji" alt="">
+    <h3 class="modal-title" id="mTitle"></h3>
+    <div class="modal-body" id="mBody"></div>
+    <div class="modal-extra" id="mExtra" hidden></div>
+    <div class="modal-cards" id="mCards" hidden></div>
+    <div class="modal-actions" id="mActions"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  var $ = function(s){ return document.querySelector(s); };
+  var IC = {"baby": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGcgdHJhbnNmb3JtPSJyb3RhdGUoMTggMzIgMzQpIj4KICAgIDxyZWN0IHg9IjI2IiB5PSIxNiIgd2lkdGg9IjEyIiBoZWlnaHQ9IjM2IiByeD0iNiIgZmlsbD0iIzljY2M2NSIgc3Ryb2tlPSIjN2NiMzQyIiBzdHJva2Utd2lkdGg9IjIuMiIvPgogICAgPGNpcmNsZSBjeD0iMzIiIGN5PSIxNSIgcj0iNCIgZmlsbD0iI2FlZDU4MSIvPgogIDwvZz4KICA8cGF0aCBkPSJNNDQgMjAgYzYgLTYgMTIgLTYgMTQgLTIgLTIgNiAtOCA4IC0xNCA0IHoiIGZpbGw9IiM2NmJiNmEiLz4KICA8cGF0aCBkPSJNMTggNTAgYzIgNCA2IDYgMTAgNiIgc3Ryb2tlPSIjNTU4YjJmIiBzdHJva2Utd2lkdGg9IjIuNiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPHJlY3QgeD0iMTAiIHk9IjU0IiB3aWR0aD0iNDQiIGhlaWdodD0iNiIgcng9IjMiIGZpbGw9IiM4ZDZlNjMiLz4KPC9zdmc+Cg==", "beach": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHBhdGggZD0iTTMyIDEwIGMxNSAwIDI0IDEwIDI0IDE5IGgtNDggYzAgLTkgOSAtMTkgMjQgLTE5IHoiIGZpbGw9IiNmZjcwNDMiLz4KICA8cGF0aCBkPSJNMzIgMTAgYzggMCAxMyA1IDE1IDExIGgtMTUgeiIgZmlsbD0iI2ZmZTBiMiIgb3BhY2l0eT0iLjg1Ii8+CiAgPHBhdGggZD0iTTMyIDEwIGMtOCAwIC0xMyA1IC0xNSAxMSBoMTUgeiIgZmlsbD0iI2ZmZTBiMiIgb3BhY2l0eT0iLjU1Ii8+CiAgPHBhdGggZD0iTTMyIDI5IHYyNSIgc3Ryb2tlPSIjNmQ0YzQxIiBzdHJva2Utd2lkdGg9IjMuNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPHBhdGggZD0iTTggNTYgcTI0IC04IDQ4IDAiIHN0cm9rZT0iI2ZmZDU0ZiIgc3Ryb2tlLXdpZHRoPSI1IiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9zdmc+Cg==", "book": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHBhdGggZD0iTTMyIDE4IEMyNiAxMiAxNiAxMSAxMCAxMyB2MjggYzYgLTIgMTYgLTEgMjIgNiB6IiBmaWxsPSIjNGZjM2Y3IiBzdHJva2U9IiMwMjg4ZDEiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgPHBhdGggZD0iTTMyIDE4IGM2IC02IDE2IC03IDIyIC01IHYyOCBjLTYgLTIgLTE2IC0xIC0yMiA2IHoiIGZpbGw9IiM4MWQ0ZmEiIHN0cm9rZT0iIzAyODhkMSIgc3Ryb2tlLXdpZHRoPSIyLjIiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8cGF0aCBkPSJNMzIgMTggdjM0IiBzdHJva2U9IiMwMjg4ZDEiIHN0cm9rZS13aWR0aD0iMi40Ii8+CiAgPGcgc3Ryb2tlPSIjZTFmNWZlIiBzdHJva2Utd2lkdGg9IjIuNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj4KICAgIDxwYXRoIGQ9Ik0xNiAyMiBoMTAiLz4KICAgIDxwYXRoIGQ9Ik0xNiAyOSBoMTAiLz4KICAgIDxwYXRoIGQ9Ik0zOCAyMiBoMTAiLz4KICAgIDxwYXRoIGQ9Ik0zOCAyOSBoMTAiLz4KICA8L2c+Cjwvc3ZnPgo=", "cert": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHJlY3QgeD0iMTIiIHk9IjgiIHdpZHRoPSI0MCIgaGVpZ2h0PSIzNiIgcng9IjQiIGZpbGw9IiNmZmYiIHN0cm9rZT0iIzkwYTRhZSIgc3Ryb2tlLXdpZHRoPSIyLjIiLz4KICA8ZyBmaWxsPSIjYjNlNWZjIj4KICAgIDxyZWN0IHg9IjE5IiB5PSIxNiIgd2lkdGg9IjI2IiBoZWlnaHQ9IjQiIHJ4PSIyIi8+CiAgICA8cmVjdCB4PSIxOSIgeT0iMjQiIHdpZHRoPSIyNiIgaGVpZ2h0PSI0IiByeD0iMiIvPgogICAgPHJlY3QgeD0iMTkiIHk9IjMyIiB3aWR0aD0iMTYiIGhlaWdodD0iNCIgcng9IjIiLz4KICA8L2c+CiAgPHBhdGggZD0iTTI0IDQyIGw4IDEwIDggLTEwIC04IC0zIHoiIGZpbGw9IiNlNTM5MzUiLz4KICA8Y2lyY2xlIGN4PSIzMiIgY3k9IjQ4IiByPSI3IiBmaWxsPSIjNDNhMDQ3IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIvPgogIDxwYXRoIGQ9Ik0yOC42IDQ4IGwyLjYgMi42IDUgLTUuNCIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIuNCIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjwvc3ZnPgo=", "check": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMjQiIGZpbGw9IiM0M2EwNDciLz4KICA8cGF0aCBkPSJNMjAgMzMgbDkgOSAxNiAtMTgiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI2IiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+Cg==", "clean": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHBhdGggZD0iTTMyIDYgQzMyIDYgNDggMjggNDggMzkgYTE2IDE2IDAgMSAxIC0zMiAwIEMxNiAyOCAzMiA2IDMyIDYgWiIgZmlsbD0iIzRmYzNmNyIgc3Ryb2tlPSIjMDI4OGQxIiBzdHJva2Utd2lkdGg9IjIuMiIvPgogIDxwYXRoIGQ9Ik0yNSAzNiBhOCA4IDAgMCAxIDQgLTgiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8cGF0aCBkPSJNNTIgMTIgbDIuNCAyLjQgLTIuNCAyLjQgLTIuNCAtMi40IHoiIGZpbGw9IiNmZmQ1NGYiLz4KICA8cGF0aCBkPSJNMTIgMTYgbDEuOCAxLjggLTEuOCAxLjggLTEuOCAtMS44IHoiIGZpbGw9IiNmZmQ1NGYiLz4KPC9zdmc+Cg==", "crab": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGcgc3Ryb2tlPSIjZTUzOTM1IiBzdHJva2Utd2lkdGg9IjMuNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIj4KICAgIDxwYXRoIGQ9Ik0xOCA0MCBMOCA0NiIvPgogICAgPHBhdGggZD0iTTIwIDQ0IEwxMiA1MiIvPgogICAgPHBhdGggZD0iTTQ2IDQwIEw1NiA0NiIvPgogICAgPHBhdGggZD0iTTQ0IDQ0IEw1MiA1MiIvPgogIDwvZz4KICA8ZWxsaXBzZSBjeD0iMzIiIGN5PSIzNiIgcng9IjE3IiByeT0iMTIiIGZpbGw9IiNlZjUzNTAiLz4KICA8ZWxsaXBzZSBjeD0iMzIiIGN5PSI0MiIgcng9IjEwIiByeT0iNSIgZmlsbD0iI2ZmY2RkMiIgb3BhY2l0eT0iLjciLz4KICA8ZyBmaWxsPSIjZWY1MzUwIiBzdHJva2U9IiNlNTM5MzUiIHN0cm9rZS13aWR0aD0iMiI+CiAgICA8Y2lyY2xlIGN4PSIxNCIgY3k9IjI4IiByPSI1LjQiLz4KICAgIDxjaXJjbGUgY3g9IjUwIiBjeT0iMjgiIHI9IjUuNCIvPgogIDwvZz4KICA8ZyBzdHJva2U9IiNlNTM5MzUiIHN0cm9rZS13aWR0aD0iMi42IiBzdHJva2UtbGluZWNhcD0icm91bmQiPgogICAgPHBhdGggZD0iTTI1IDI2IEwyMiAxNiIvPgogICAgPHBhdGggZD0iTTM5IDI2IEw0MiAxNiIvPgogIDwvZz4KICA8Y2lyY2xlIGN4PSIyMS41IiBjeT0iMTQuNSIgcj0iNCIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjZTUzOTM1IiBzdHJva2Utd2lkdGg9IjIiLz4KICA8Y2lyY2xlIGN4PSI0Mi41IiBjeT0iMTQuNSIgcj0iNCIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjZTUzOTM1IiBzdHJva2Utd2lkdGg9IjIiLz4KICA8Y2lyY2xlIGN4PSIyMS41IiBjeT0iMTQuNSIgcj0iMS42IiBmaWxsPSIjMzc0NzRmIi8+CiAgPGNpcmNsZSBjeD0iNDIuNSIgY3k9IjE0LjUiIHI9IjEuNiIgZmlsbD0iIzM3NDc0ZiIvPgogIDxwYXRoIGQ9Ik0yNyA0MCBxNSA0IDEwIDAiIHN0cm9rZT0iI2I3MWMxYyIgc3Ryb2tlLXdpZHRoPSIyLjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4K", "cross": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMjQiIGZpbGw9IiNlNTM5MzUiLz4KICA8cGF0aCBkPSJNMjIgMjIgTDQyIDQyIE00MiAyMiBMMjIgNDIiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI2IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9zdmc+Cg==", "fish": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGVsbGlwc2UgY3g9IjI4IiBjeT0iMzQiIHJ4PSIxOCIgcnk9IjExIiBmaWxsPSIjZmZiMzAwIi8+CiAgPHBhdGggZD0iTTQ0IDM0IEw1OCAyNCBMNTggNDQgWiIgZmlsbD0iI2ZmOGYwMCIvPgogIDxwYXRoIGQ9Ik0yMiAyNCBxNiAtOCAxMiAtMiIgZmlsbD0iI2ZmOGYwMCIvPgogIDxjaXJjbGUgY3g9IjE4IiBjeT0iMzEiIHI9IjIuNiIgZmlsbD0iI2ZmZiIvPgogIDxjaXJjbGUgY3g9IjE4IiBjeT0iMzEiIHI9IjEuMiIgZmlsbD0iIzM3NDc0ZiIvPgogIDxwYXRoIGQ9Ik0yNCAzOCBxNiA0IDEyIDAiIHN0cm9rZT0iI2U2NTEwMCIgc3Ryb2tlLXdpZHRoPSIxLjgiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxjaXJjbGUgY3g9IjUyIiBjeT0iMTYiIHI9IjMuNCIgZmlsbD0iIzRmYzNmNyIvPgogIDxjaXJjbGUgY3g9IjU4IiBjeT0iMTAiIHI9IjIuNCIgZmlsbD0iIzgxZDRmYSIvPgo8L3N2Zz4K", "fullscreen": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGcgc3Ryb2tlPSIjMDI4OGQxIiBzdHJva2Utd2lkdGg9IjUiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+CiAgICA8cGF0aCBkPSJNMjIgMTAgVjIyIEgxMCIvPgogICAgPHBhdGggZD0iTTQyIDEwIFYyMiBINTQiLz4KICAgIDxwYXRoIGQ9Ik0yMiA1NCBWNDIgSDEwIi8+CiAgICA8cGF0aCBkPSJNNDIgNTQgVjQyIEg1NCIvPgogIDwvZz4KPC9zdmc+Cg==", "hint": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGNpcmNsZSBjeD0iMzIiIGN5PSIyNiIgcj0iMTQiIGZpbGw9IiNmZmQ1NGYiIHN0cm9rZT0iI2ZmYjMwMCIgc3Ryb2tlLXdpZHRoPSIyLjQiLz4KICA8cGF0aCBkPSJNMjYgMzkgaDEyIHY2IGgtMTIgeiIgZmlsbD0iIzkwYTRhZSIvPgogIDxwYXRoIGQ9Ik0yNyA0OCBoMTAgdjQgYTIgMiAwIDAgMSAtMiAyIGgtNiBhMiAyIDAgMCAxIC0yIC0yIHoiIGZpbGw9IiM3ODkwOWMiLz4KICA8cGF0aCBkPSJNMzIgNiB2NCBNMTIgMTIgbDMgMyBNNTIgMTIgbC0zIDMiIHN0cm9rZT0iI2ZmYjMwMCIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8cGF0aCBkPSJNMjcgMjQgYTYgNiAwIDAgMSA1IC00IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMi42IiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9zdmc+Cg==", "leaves": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHBhdGggZD0iTTEyIDUyIFEgMjggMzAgNTIgMTIgUSAzMiAzMiAxMiA1MiBaIiBmaWxsPSIjYTE4ODdmIiBzdHJva2U9IiM2ZDRjNDEiIHN0cm9rZS13aWR0aD0iMi4yIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgPHBhdGggZD0iTTEyIDUyIEwgNDYgMTgiIHN0cm9rZT0iIzZkNGM0MSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8cGF0aCBkPSJNMTIgNTIgQzEyIDU2IDE0IDU4IDE4IDU4IiBzdHJva2U9IiM2ZDRjNDEiIHN0cm9rZS13aWR0aD0iMi42IiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9zdmc+Cg==", "lock": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHBhdGggZD0iTTIyIDI4IHYtNSBhMTAgMTAgMCAwIDEgMjAgMCB2NSIgc3Ryb2tlPSIjNmQ0YzQxIiBzdHJva2Utd2lkdGg9IjUiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxyZWN0IHg9IjE2IiB5PSIyNyIgd2lkdGg9IjMyIiBoZWlnaHQ9IjI2IiByeD0iNyIgZmlsbD0iI2ZmYjMwMCIgc3Ryb2tlPSIjZjU3ZjE3IiBzdHJva2Utd2lkdGg9IjIuMiIvPgogIDxjaXJjbGUgY3g9IjMyIiBjeT0iMzciIHI9IjQuMiIgZmlsbD0iIzVkNDAzNyIvPgogIDxyZWN0IHg9IjMwLjIiIHk9IjM5IiB3aWR0aD0iMy42IiBoZWlnaHQ9IjgiIHJ4PSIxLjgiIGZpbGw9IiM1ZDQwMzciLz4KPC9zdmc+Cg==", "mud": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHBhdGggZD0iTTYgNTAgUTE4IDM0IDMyIDM4IFE0NiAzMiA1OCA1MCBaIiBmaWxsPSIjOGQ2ZTYzIiBzdHJva2U9IiM1ZDQwMzciIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogIDxjaXJjbGUgY3g9IjQyIiBjeT0iMjIiIHI9IjkiIGZpbGw9IiNmZmYiIHN0cm9rZT0iIzRmYzNmNyIgc3Ryb2tlLXdpZHRoPSIyLjIiLz4KICA8cGF0aCBkPSJNMTIgMjQgUTIwIDE0IDMwIDE4IFEyNiAyOCAxMiAyNCBaIiBmaWxsPSIjNjZiYjZhIi8+Cjwvc3ZnPgo=", "muted": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHBhdGggZD0iTTEyIDI0IGg3IGwxMiAtOSB2MzQgbC0xMiAtOSBoLTcgeiIgZmlsbD0iIzkwYTRhZSIvPgogIDxnIHN0cm9rZT0iI2U1MzkzNSIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbGluZWNhcD0icm91bmQiPgogICAgPHBhdGggZD0iTTM4IDI0IEw1NCA0MCIvPgogICAgPHBhdGggZD0iTTU0IDI0IEwzOCA0MCIvPgogIDwvZz4KPC9zdmc+Cg==", "oxygen": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHJlY3QgeD0iNiIgeT0iNTIiIHdpZHRoPSI1MiIgaGVpZ2h0PSI4IiByeD0iNCIgZmlsbD0iIzhkNmU2MyIvPgogIDxyZWN0IHg9IjI5IiB5PSIzMCIgd2lkdGg9IjYiIGhlaWdodD0iMjQiIHJ4PSIzIiBmaWxsPSIjYTE4ODdmIiBzdHJva2U9IiM2ZDRjNDEiIHN0cm9rZS13aWR0aD0iMS42Ii8+CiAgPGNpcmNsZSBjeD0iMTkiIGN5PSIyNiIgcj0iNiIgZmlsbD0iIzRmYzNmNyIvPgogIDxjaXJjbGUgY3g9IjE3IiBjeT0iMjQiIHI9IjEuOCIgZmlsbD0iI2ZmZiIvPgogIDxjaXJjbGUgY3g9IjQ2IiBjeT0iMTgiIHI9IjciIGZpbGw9IiM4MWQ0ZmEiLz4KICA8Y2lyY2xlIGN4PSI0My42IiBjeT0iMTUuNiIgcj0iMiIgZmlsbD0iI2ZmZiIvPgogIDxjaXJjbGUgY3g9IjQyIiBjeT0iMzYiIHI9IjQuNSIgZmlsbD0iIzRmYzNmNyIvPgogIDxjaXJjbGUgY3g9IjQwLjYiIGN5PSIzNC42IiByPSIxLjQiIGZpbGw9IiNmZmYiLz4KPC9zdmc+Cg==", "plain": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHBhdGggZD0iTTMyIDUyIFYyOCIgc3Ryb2tlPSIjN2NiMzQyIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMiAzNCBDMjIgMzIgMTYgMjYgMTYgMTggQzI2IDE4IDMyIDI0IDMyIDM0IFoiIGZpbGw9IiNhZWQ1ODEiLz4KICA8cGF0aCBkPSJNMzIgMzAgQzQyIDI4IDQ4IDIyIDQ4IDE0IEMzOCAxNCAzMiAyMCAzMiAzMCBaIiBmaWxsPSIjYzVlMWE1Ii8+CiAgPHJlY3QgeD0iMTIiIHk9IjUyIiB3aWR0aD0iNDAiIGhlaWdodD0iNiIgcng9IjMiIGZpbGw9IiNiMGJlYzUiLz4KPC9zdmc+Cg==", "restart": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHBhdGggZD0iTTUyIDMyIGEyMCAyMCAwIDEgMSAtNiAtMTQuNCIgc3Ryb2tlPSIjMDI4OGQxIiBzdHJva2Utd2lkdGg9IjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01MiA4IHYxMiBoLTEyIHoiIGZpbGw9IiMwMjg4ZDEiLz4KPC9zdmc+Cg==", "rocket": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHBhdGggZD0iTTMyIDQgYzkgOSAxMiAyMCAxMiAzMCBoLTI0IGMwIC0xMCAzIC0yMSAxMiAtMzAgeiIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjOTBhNGFlIiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogIDxjaXJjbGUgY3g9IjMyIiBjeT0iMjQiIHI9IjUuNCIgZmlsbD0iIzRmYzNmNyIgc3Ryb2tlPSIjMDI4OGQxIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8cGF0aCBkPSJNMjAgMzAgYy02IDQgLTggMTAgLTcgMTYgbDcgLTcgeiIgZmlsbD0iI2U1MzkzNSIvPgogIDxwYXRoIGQ9Ik00NCAzMCBjNiA0IDggMTAgNyAxNiBsLTcgLTcgeiIgZmlsbD0iI2U1MzkzNSIvPgogIDxwYXRoIGQ9Ik0yNiAzOCBoMTIgbC02IDE0IHoiIGZpbGw9IiNmZmIzMDAiLz4KICA8cGF0aCBkPSJNMjkgNDAgaDYgbC0zIDggeiIgZmlsbD0iI2ZmZDU0ZiIvPgo8L3N2Zz4K", "root": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGNpcmNsZSBjeD0iMzIiIGN5PSIyMCIgcj0iMTUiIGZpbGw9IiM0M2EwNDciLz4KICA8Y2lyY2xlIGN4PSIyNSIgY3k9IjE2IiByPSI1IiBmaWxsPSIjNjZiYjZhIi8+CiAgPHJlY3QgeD0iMjkiIHk9IjMwIiB3aWR0aD0iNiIgaGVpZ2h0PSIxOCIgcng9IjIiIGZpbGw9IiM2ZDRjNDEiLz4KICA8ZyBzdHJva2U9IiM2ZDRjNDEiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIj4KICAgIDxwYXRoIGQ9Ik0yOSA0NiBDMjQgNTAgMjAgNTIgMTQgNTQiLz4KICAgIDxwYXRoIGQ9Ik0zNSA0NiBDNDAgNTAgNDQgNTIgNTAgNTQiLz4KICAgIDxwYXRoIGQ9Ik0zMiA0NyBDMzIgNTEgMzEgNTMgMjkgNTYiLz4KICA8L2c+CiAgPHJlY3QgeD0iNiIgeT0iNTUiIHdpZHRoPSI1MiIgaGVpZ2h0PSI2IiByeD0iMyIgZmlsbD0iI2ExODg3ZiIvPgo8L3N2Zz4K", "salt": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHJlY3QgeD0iMjIiIHk9IjI0IiB3aWR0aD0iMjAiIGhlaWdodD0iMzAiIHJ4PSI2IiBmaWxsPSIjNGZjM2Y3IiBzdHJva2U9IiMwMjg4ZDEiIHN0cm9rZS13aWR0aD0iMi41Ii8+CiAgPHJlY3QgeD0iMjUiIHk9IjE2IiB3aWR0aD0iMTQiIGhlaWdodD0iOSIgcng9IjMuNSIgZmlsbD0iIzAyODhkMSIvPgogIDxjaXJjbGUgY3g9IjI5IiBjeT0iMjAuNSIgcj0iMS42IiBmaWxsPSIjZTFmNWZlIi8+CiAgPGNpcmNsZSBjeD0iMzUiIGN5PSIyMC41IiByPSIxLjYiIGZpbGw9IiNlMWY1ZmUiLz4KICA8Y2lyY2xlIGN4PSIzMiIgY3k9IjIwLjUiIHI9IjEuNiIgZmlsbD0iI2UxZjVmZSIvPgogIDxwYXRoIGQ9Ik00NiAyMiBsNCA0IC00IDQgLTQgLTQgeiIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjNGZjM2Y3IiBzdHJva2Utd2lkdGg9IjIiLz4KICA8cGF0aCBkPSJNNTAgMzQgbDMgMyAtMyAzIC0zIC0zIHoiIGZpbGw9IiNlMWY1ZmUiIHN0cm9rZT0iIzRmYzNmNyIgc3Ryb2tlLXdpZHRoPSIxLjYiLz4KICA8cGF0aCBkPSJNNDIgNDIgbDIuNiAyLjYgLTIuNiAyLjYgLTIuNiAtMi42IHoiIGZpbGw9IiNmZmYiIHN0cm9rZT0iIzRmYzNmNyIgc3Ryb2tlLXdpZHRoPSIxLjYiLz4KPC9zdmc+Cg==", "shell": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHBhdGggZD0iTTMyIDUyIEwxMCA1MCBBMjIgMjIgMCAwIDEgNTQgNTAgWiIgZmlsbD0iI2ZmZDU0ZiIgc3Ryb2tlPSIjZmZiMzAwIiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogIDxnIHN0cm9rZT0iI2Y1N2YxNyIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiPgogICAgPHBhdGggZD0iTTMyIDUyIEwyMCAzNCIvPgogICAgPHBhdGggZD0iTTMyIDUyIEwzMiAzMCIvPgogICAgPHBhdGggZD0iTTMyIDUyIEw0NCAzNCIvPgogIDwvZz4KICA8Y2lyY2xlIGN4PSIzMiIgY3k9IjUyIiByPSIzIiBmaWxsPSIjZjU3ZjE3Ii8+Cjwvc3ZnPgo=", "sound": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHBhdGggZD0iTTEyIDI0IGg3IGwxMiAtOSB2MzQgbC0xMiAtOSBoLTcgeiIgZmlsbD0iIzAyODhkMSIvPgogIDxnIHN0cm9rZT0iIzAyODhkMSIgc3Ryb2tlLXdpZHRoPSIzLjYiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCI+CiAgICA8cGF0aCBkPSJNMzggMjIgYTEyIDEyIDAgMCAxIDAgMjAiLz4KICAgIDxwYXRoIGQ9Ik00NSAxNiBhMjIgMjIgMCAwIDEgMCAzMiIvPgogIDwvZz4KPC9zdmc+Cg==", "teacher": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGNpcmNsZSBjeD0iMjQiIGN5PSIxOCIgcj0iOCIgZmlsbD0iI2ZmZTBiMiIgc3Ryb2tlPSIjZTBhYzY5IiBzdHJva2Utd2lkdGg9IjIiLz4KICA8cGF0aCBkPSJNMTIgNTQgYzAgLTEzIDUgLTIwIDEyIC0yMCBzMTIgNyAxMiAyMCB6IiBmaWxsPSIjMDI4OGQxIi8+CiAgPHBhdGggZD0iTTM0IDM0IEw1MCAyMiIgc3Ryb2tlPSIjNmQ0YzQxIiBzdHJva2Utd2lkdGg9IjMuNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPGNpcmNsZSBjeD0iNTEiIGN5PSIyMSIgcj0iMy40IiBmaWxsPSIjZTUzOTM1Ii8+Cjwvc3ZnPgo=", "tree": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGNpcmNsZSBjeD0iMzIiIGN5PSIyMiIgcj0iMTYiIGZpbGw9IiM2NmJiNmEiLz4KICA8Y2lyY2xlIGN4PSIyNCIgY3k9IjE3IiByPSI1IiBmaWxsPSIjYTVkNmE3Ii8+CiAgPHJlY3QgeD0iMjkiIHk9IjM0IiB3aWR0aD0iNiIgaGVpZ2h0PSIxOCIgcng9IjIuNCIgZmlsbD0iIzZkNGM0MSIvPgogIDxyZWN0IHg9IjgiIHk9IjU0IiB3aWR0aD0iNDgiIGhlaWdodD0iNyIgcng9IjMuNSIgZmlsbD0iI2ExODg3ZiIvPgo8L3N2Zz4K", "trophy": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHBhdGggZD0iTTIwIDEwIGgyNCB2OSBhMTIgMTIgMCAwIDEgLTI0IDAgeiIgZmlsbD0iI2ZmZDU0ZiIgc3Ryb2tlPSIjZmZiMzAwIiBzdHJva2Utd2lkdGg9IjIuMiIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogIDxnIHN0cm9rZT0iI2ZmYjMwMCIgc3Ryb2tlLXdpZHRoPSIzLjQiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCI+CiAgICA8cGF0aCBkPSJNMjAgMTQgaC02IGE4IDggMCAwIDAgOCA4Ii8+CiAgICA8cGF0aCBkPSJNNDQgMTQgaDYgYTggOCAwIDAgMSAtOCA4Ii8+CiAgPC9nPgogIDxyZWN0IHg9IjI5IiB5PSIzMSIgd2lkdGg9IjYiIGhlaWdodD0iOSIgZmlsbD0iI2ZmYjMwMCIvPgogIDxyZWN0IHg9IjIzIiB5PSI0MCIgd2lkdGg9IjE4IiBoZWlnaHQ9IjYiIHJ4PSIyIiBmaWxsPSIjNmQ0YzQxIi8+CiAgPHJlY3QgeD0iMTkiIHk9IjQ4IiB3aWR0aD0iMjYiIGhlaWdodD0iNiIgcng9IjIuNiIgZmlsbD0iIzhkNmU2MyIvPgogIDxjaXJjbGUgY3g9IjMyIiBjeT0iMTgiIHI9IjMuNCIgZmlsbD0iI2ZmZiIvPgo8L3N2Zz4K", "trunk": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMjQiIGZpbGw9IiNhMTg4N2YiIHN0cm9rZT0iIzZkNGM0MSIgc3Ryb2tlLXdpZHRoPSIyLjQiLz4KICA8Y2lyY2xlIGN4PSIzMiIgY3k9IjMyIiByPSIxNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjOGQ2ZTYzIiBzdHJva2Utd2lkdGg9IjIuMiIvPgogIDxjaXJjbGUgY3g9IjMyIiBjeT0iMzIiIHI9IjkiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzhkNmU2MyIgc3Ryb2tlLXdpZHRoPSIyLjIiLz4KICA8Y2lyY2xlIGN4PSIzMiIgY3k9IjMyIiByPSIzLjQiIGZpbGw9IiM1ZDQwMzciLz4KPC9zdmc+Cg==", "warn": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHBhdGggZD0iTTMyIDggTDU4IDU0IEg2IFoiIGZpbGw9IiNmZmQ1NGYiIHN0cm9rZT0iI2ZmYjMwMCIgc3Ryb2tlLXdpZHRoPSIyLjYiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8cmVjdCB4PSIyOC44IiB5PSIyNCIgd2lkdGg9IjYuNCIgaGVpZ2h0PSIxNyIgcng9IjMuMiIgZmlsbD0iIzVkNDAzNyIvPgogIDxjaXJjbGUgY3g9IjMyIiBjeT0iNDciIHI9IjMuOCIgZmlsbD0iIzVkNDAzNyIvPgo8L3N2Zz4K", "wave": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHBhdGggZD0iTTYgMjQgcTggLTkgMTYgMCB0MTYgMCB0MTYgMCIgc3Ryb2tlPSIjNGZjM2Y3IiBzdHJva2Utd2lkdGg9IjUuNCIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPHBhdGggZD0iTTYgNDAgcTggLTkgMTYgMCB0MTYgMCB0MTYgMCIgc3Ryb2tlPSIjMDI4OGQxIiBzdHJva2Utd2lkdGg9IjUuNCIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPGNpcmNsZSBjeD0iNTAiIGN5PSIxNCIgcj0iMyIgZmlsbD0iIzgxZDRmYSIvPgogIDxjaXJjbGUgY3g9IjE0IiBjeT0iNTQiIHI9IjMuNCIgZmlsbD0iIzRmYzNmNyIvPgo8L3N2Zz4K"};
+
+  /* ================= 音效 ================= */
+  var actx = null;
+  var soundOn = { v: true };
+  function tone(freq, dur, type, gain, delay){
+    if(!soundOn.v) return;
+    try{
+      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+      if(actx.state === 'suspended') actx.resume();
+      var t = actx.currentTime + (delay || 0);
+      var o = actx.createOscillator(), g = actx.createGain();
+      o.type = type || 'sine'; o.frequency.value = freq;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.linearRampToValueAtTime(gain || 0.06, t + 0.015);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + (dur || 0.12));
+      o.connect(g); g.connect(actx.destination);
+      o.start(t); o.stop(t + (dur || 0.12) + 0.03);
+    }catch(e){}
+  }
+  function sweep(up){
+    if(!soundOn.v) return;
+    try{
+      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+      if(actx.state === 'suspended') actx.resume();
+      var t = actx.currentTime;
+      var o = actx.createOscillator(), g = actx.createGain();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(up ? 260 : 520, t);
+      o.frequency.exponentialRampToValueAtTime(up ? 540 : 240, t + 0.5);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.linearRampToValueAtTime(0.05, t + 0.05);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.55);
+      o.connect(g); g.connect(actx.destination);
+      o.start(t); o.stop(t + 0.6);
+    }catch(e){}
+  }
+  var sfx = {
+    click:   function(){ tone(660, .07, 'triangle', .05); },
+    correct: function(){ tone(523,.12,'sine',.07,0); tone(659,.12,'sine',.07,.1); tone(784,.2,'sine',.07,.2); },
+    wrong:   function(){ tone(196,.16,'square',.045,0); tone(147,.22,'square',.045,.13); },
+    win:     function(){ [523,659,784,1047,1319].forEach(function(f,i){ tone(f,.24,'triangle',.07,i*.13); }); }
+  };
+
+  /* ================= 彩带 ================= */
+  function confetti(n){
+    n = n || 80;
+    var colors = ['#ef5350','#ffca28','#66bb6a','#42a5f5','#ab47bc','#ff7043','#26c6da'];
+    for(var i=0;i<n;i++){
+      var d = document.createElement('i');
+      d.className = 'confetti';
+      d.style.left = (Math.random()*100) + 'vw';
+      d.style.background = colors[i % colors.length];
+      d.style.animationDuration = (1.5 + Math.random()*1.3) + 's';
+      d.style.animationDelay = (Math.random()*0.45) + 's';
+      document.body.appendChild(d);
+      (function(el){ setTimeout(function(){ el.remove(); }, 3400); })(d);
+    }
+  }
+
+  /* ================= 关卡数据（5 关） ================= */
+  var CHALLENGES = [
+    {
+      key: 'salt', icon: 'salt', title: '又咸又苦的海水',
+      scenario: '涨潮啦！又咸又苦的海水漫过滩涂，盐分拼命往你身体里钻。普通植物的细胞盐分过高、叶片失水，很快就枯萎了——你该怎么办？',
+      hint: '想一想：红树的叶片上藏着什么特别的构造，可以把盐“扔”出去？',
+      options: [
+        { label:'A', ok:true,
+          text:'启动泌盐！让叶片上的盐腺把多余的盐排出去，结成白色盐晶',
+          explain:'这就是超能力①【泌盐】！红树的叶片上长着密密麻麻的盐腺，像无数个“排盐小出口”，把体内多余的盐送到叶面上。退潮后仔细看，叶片上白白的小颗粒就是盐晶。除了泌盐，红树还会“拒盐”（靠根系把盐挡在体外）和“储盐”（用肉肉的叶片把盐隔离起来）。' },
+        { label:'B', ok:false,
+          text:'拼命喝水！多喝海水，把盐分冲淡',
+          hint:'海水越喝越咸，身体还会流失更多水分哦。' },
+        { label:'C', ok:false,
+          text:'请小鱼帮忙！让小鱼帮我把盐叼走',
+          hint:'小鱼可帮不上这个忙，红树得靠自己的真本领。' }
+      ],
+      rowNormal: '细胞内盐分浓度过高，叶片失水枯萎',
+      rowMangrove: '通过叶片盐腺排出多余盐分，维持正常生长'
+    },
+    {
+      key: 'oxygen', icon: 'oxygen', title: '没有氧气的淤泥',
+      scenario: '潮水退去，淤泥里闷闷的，一点氧气都没有，根根都快喘不过气来了！普通植物的根系无法呼吸，整株都会死亡——你该怎么办？',
+      hint: '想一想：红树除了往下扎的根，还会往哪里长根？',
+      options: [
+        { label:'A', ok:true,
+          text:'长出呼吸根！像吸管一样伸出泥面，直接从空气中获取氧气',
+          explain:'这就是超能力②【呼吸根】！红树有一套完整的“根系工具箱”：往下扎的根抓紧滩涂，横向的板状根支撑身体，向上伸出泥面的呼吸根专门负责“吸气”。白骨壤的呼吸根像成千上万支铅笔插在泥滩上，可壮观啦！' },
+        { label:'B', ok:false,
+          text:'屏住呼吸！憋一会儿，等下一次涨潮',
+          hint:'根可不会屏住呼吸，缺氧太久植株会死亡。' },
+        { label:'C', ok:false,
+          text:'拔掉根！没有根就不需要氧气了',
+          hint:'没有根，小红树会被潮水冲走的。' }
+      ],
+      rowNormal: '根系缺氧无法进行呼吸作用，植株死亡',
+      rowMangrove: '气生根（呼吸根）伸出泥面，从空气中获取氧气'
+    },
+    {
+      key: 'baby', icon: 'baby', title: '小种子危机',
+      scenario: '你要生宝宝啦！可是小种子如果直接掉进淤泥，会被潮水冲得无影无踪。普通植物的种子就是这样白白漂走的——你该怎么办？',
+      hint: '想一想：能不能让种子先在“妈妈”身上发芽，再落到泥里？',
+      options: [
+        { label:'A', ok:true,
+          text:'胎生！让种子先在妈妈身上发芽，长成棒状胚轴，再落进泥里',
+          explain:'这就是超能力③【胎生】！红树的种子不离开妈妈就开始萌发，长成棒状的“胚轴”，里面装满了养分。成熟后“啵”地掉进淤泥，几小时就能扎根；就算被潮水冲走，胚轴也能在海上漂流很久，到达远方再安家。' },
+        { label:'B', ok:false,
+          text:'弹弓发射！把种子弹得远远的，落在哪里算哪里',
+          hint:'弹得太远，种子可能落在不适合生长的地方。' },
+        { label:'C', ok:false,
+          text:'随波逐流！让小种子漂到哪里算哪里',
+          hint:'太被动啦，大多数种子会被冲进深海，无法及时扎根。' }
+      ],
+      rowNormal: '种子随潮水漂走，无法及时扎根',
+      rowMangrove: '胎生幼苗在母树上发育，落地后数小时内快速扎根'
+    },
+    {
+      key: 'root', icon: 'root', title: '台风与巨浪',
+      scenario: '台风来了！巨大的海浪一波波冲向滩涂，普通植物会被连根拔起、冲进大海——你该怎么办？',
+      hint: '想一想：红树靠什么“手”紧紧抓住滩涂？',
+      options: [
+        { label:'A', ok:true,
+          text:'长出支柱根和板状根！像无数只手抓紧滩涂，还能挡住海浪',
+          explain:'这就是第四件法宝【支柱根 / 板状根】！支柱根从树干斜插进泥里，板状根像翅膀一样抱住地面，既能固定植株，又能削弱海浪、促使泥沙堆积。500 米宽的成熟红树林带，可以削减超过 70% 的波高，是真正的“海岸卫士”！' },
+        { label:'B', ok:false,
+          text:'把叶子收起来！减小风力就不怕浪了',
+          hint:'收叶子挡不住巨浪，关键在根。' },
+        { label:'C', ok:false,
+          text:'顺着浪跑到岸上去！先躲一躲',
+          hint:'红树可不会走路，它靠的是发达的根系。' }
+      ],
+      rowNormal: '被风浪连根拔起，冲进大海',
+      rowMangrove: '支柱根、板状根抓紧滩涂，削减波高、保护海岸'
+    },
+    {
+      key: 'clean', icon: 'clean', title: '浑浊的海水',
+      scenario: '雨水把陆地上的泥沙和脏东西冲进海里，海水变得浑浊，还带着多余的氮和磷。普通植物只能干着急——你该怎么办？',
+      hint: '想一想：红树庞大的根系，除了呼吸还能做什么？',
+      options: [
+        { label:'A', ok:true,
+          text:'启动“海水净化器”！用根系吸附悬浮物，吸收氮、磷等营养盐',
+          explain:'这就是另一项超能力【净化海水】！红树发达的根系能吸附水体里的悬浮物，吸收氮、磷等过剩营养盐，还能降解污染物。经它净化后的近岸海水，才是鱼虾们干净的家。' },
+        { label:'B', ok:false,
+          text:'拿海绵把脏东西擦掉',
+          hint:'海里可没有这么大的海绵。' },
+        { label:'C', ok:false,
+          text:'等一场大雨把脏东西冲走',
+          hint:'大雨只会带来更多泥沙。' }
+      ],
+      rowNormal: '悬浮物和多余营养盐让水质越来越差',
+      rowMangrove: '根系吸附悬浮物、吸收氮磷，净化近岸海水'
+    }
+  ];
+
+  var LOCK_TEXT = '完成挑战后揭晓';
+
+  /* ================= 图鉴与彩蛋 ================= */
+  var FAMILY = {
+    icon: 'tree', title: '红树林大家族',
+    body: '红树林不是一种树，而是由几十种红树植物组成的大家庭。全世界的真红树植物约有 70 种，中国分布着约 30 种。来认识三位已经解锁的超能力选手：',
+    cards: [
+      { ico:'baby', name:'秋茄', tag:'胎生冠军',
+        desc:'胚轴又细又长，像一支绿色的笔，掉进泥里几小时就能扎根。它还特别耐寒，是中国分布最北的红树之一（福建福鼎）。' },
+      { ico:'salt', name:'桐花树', tag:'泌盐能手',
+        desc:'叶面上藏着许多盐腺，能把多余的盐排出来，结成白白的盐晶；越咸的滩涂它越精神。' },
+      { ico:'oxygen', name:'白骨壤', tag:'呼吸根达人',
+        desc:'从泥里伸出成千上万根“铅笔根”，像吸管一样呼吸空气，能在盐度很高的低潮滩生活。' }
+    ],
+    extra: '它们各有不同的“超能力组合拳”，一起守护着我们的海岸。'
+  };
+
+  var DEX = {
+    icon: 'book', title: '红树图鉴',
+    body: '红树家族的六位成员，各有一手生存绝活：',
+    cards: [
+      { ico:'baby', name:'秋茄', tag:'胎生冠军',
+        desc:'胚轴又细又长，像一支绿色的笔，掉进泥里几小时就能扎根。它还特别耐寒，是中国分布最北的红树之一（福建福鼎）。' },
+      { ico:'salt', name:'桐花树', tag:'泌盐能手',
+        desc:'叶面上藏着许多盐腺，能把多余的盐排出来，结成白白的盐晶；越咸的滩涂它越精神。' },
+      { ico:'oxygen', name:'白骨壤', tag:'呼吸根达人',
+        desc:'从泥里伸出成千上万根“铅笔根”，像吸管一样呼吸空气，能在盐度很高的低潮滩生活。' },
+      { ico:'trunk', name:'木榄', tag:'板状根壮士',
+        desc:'膝盖状的呼吸根一节一节，树皮又厚又富含单宁，氧化后变成红褐色——“红树”之名的代言人。' },
+      { ico:'clean', name:'海桑', tag:'储盐达人',
+        desc:'用肉肉的叶片把盐分隔离储存，再靠落叶把盐“扔”掉；生长速度在红树家族里数一数二。' },
+      { ico:'tree', name:'红树', tag:'名字代言人',
+        desc:'红树科的代表，支柱根发达，胚轴能在海上漂流数月，落到远方也能安家。' }
+    ],
+    extra: '小知识：上世纪引入的无瓣海桑、拉关木等外来树种长得太疯，现在海南正在清理它们——引种外来物种一定要非常小心！'
+  };
+
+  var EGGS = {
+    trunk: {
+      icon: 'trunk', title: '红树名字的由来',
+      body: '红树林的叶子是绿色的，那为什么叫“红树”呢？秘密藏在树皮里！红树的树皮和木材富含单宁酸，被刮开或砍断后接触到空气，会慢慢氧化变成红色或红褐色——“红树林”的名字就是这样来的。',
+      extra: '小任务：单宁酸会让食物有“涩涩”的味道，猜猜看，浓茶和柿子里的涩味来自什么？'
+    },
+    leaves: {
+      icon: 'leaves', title: '大海的“食物工厂”',
+      body: '红树的落叶掉在滩涂上，会慢慢分解成“有机碎屑”，潮水再把它们送进大海，成为鱼、虾、蟹、贝的食物。红树林不仅是“海岸卫士”，还是养育海洋生物的大食堂！',
+      extra: '趣味知识：我国红树林湿地记录到的生物超过 3000 种，很多小鱼小虾小时候都住在红树林里。'
+    },
+    warn: {
+      icon: 'warn', title: '红树林的危机',
+      body: '红树林很脆弱：互花米草等外来物种入侵、水体污染、围塘养殖、海平面上升……都可能伤害它们。好在我国已经把超过 90% 的红树林划入生态保护红线，努力守护这片“海上森林”。',
+      extra: '我们能做的：不乱扔垃圾、少用一次性塑料、爱护海滩——保护红树林，从身边小事做起！'
+    },
+    fish: {
+      icon: 'fish', title: '大海幼儿园',
+      body: '红树林茂密的根系是鱼、虾、蟹、贝的“育幼场”——小鱼小虾们在这里躲天敌、找食物，长大后游向大海。我国红树林湿地记录到的生物超过 3000 种，勺嘴鹬、黑脸琵鹭等候鸟也把这里当作长途迁徙的“服务区”。',
+      extra: '候鸟小知识：全球黑脸琵鹭从 2000 年的约 800 只增加到 2024 年的近 7000 只，深圳湾是它们重要的越冬地。'
+    },
+    crab: {
+      icon: 'crab', title: '滩涂小居民',
+      body: '退潮后的泥滩上，招潮蟹会挥着大钳子“打招呼”，弹涂鱼会用胸鳍在泥上“走路”。它们和红树林组成了一个热闹的社区：红树为它们提供家园，它们帮助疏松泥土、分解落叶。',
+      extra: '观察任务：去海边时试着找一找红树林泥滩上的小洞口，那很可能就是招潮蟹的家。'
+    },
+    mud: {
+      icon: 'mud', title: '会“锁碳”的滩涂',
+      body: '别小看这片黑黑的淤泥！红树林是“蓝碳明星”：单位面积固碳能力远高于温带森林，深圳福田红树林每年可固定约 4000 吨二氧化碳，滩涂里缺氧的环境还能把碳封存上千年。',
+      extra: '蓝碳小知识：红树林、海草床、盐沼是地球三大蓝碳生态系统，是应对气候变化的“秘密武器”。'
+    }
+  };
+
+  var CERT = {
+    icon: 'trophy', title: '潮间带生存大师',
+    body: '太棒了！小红树集齐了五件超能力法宝：<b>泌盐 · 呼吸根 · 胎生 · 支柱根 · 净化</b>，成为了真正的潮间带生存大师！',
+    extra: '红树的法宝还不止这些——点击右上角红树图鉴认识整个家族，再点点场景里的树干、落叶、小鱼、招潮蟹和滩涂，还有更多秘密等你发现！'
+  };
+
+  /* ================= 状态与元素 ================= */
+  var state = { idx: 0, done: {}, won: false };
+
+  var scene = $('#scene');
+  var sceneIntro = $('#sceneIntro'), startBtn = $('#startBtn');
+  var chNo = $('#chNo'), chTitle = $('#chTitle'), chEmoji = $('#chEmoji'), chScenario = $('#chScenario');
+  var optionsEl = $('#optionsEl'), hintBtn = $('#hintBtn'), hintBox = $('#hintBox');
+  var feedback = $('#feedback'), challengeCard = $('#challengeCard'), winPanel = $('#winPanel');
+  var sceneToast = $('#sceneToast'), mask = $('#mask');
+  var mEmoji = $('#mEmoji'), mTitle = $('#mTitle'), mBody = $('#mBody'), mExtra = $('#mExtra');
+  var mCards = $('#mCards'), mActions = $('#mActions'), modalClose = $('#modalClose');
+  var familyHs = $('#hs-family'), familyImg = $('#hs-family-img');
+  var soundImg = $('#soundImg'), soundTxt = $('#soundTxt');
+  var fsTxt = $('#fsTxt');
+  var toastTimer = null;
+
+  function setFamilyIcon(name){
+    familyImg.setAttribute('href', IC[name]);
+    familyImg.setAttribute('xlink:href', IC[name]);
+  }
+
+  function showToast(text){
+    sceneToast.textContent = text;
+    sceneToast.classList.add('show');
+    if(toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ sceneToast.classList.remove('show'); }, 2800);
+  }
+
+  /* ================= 游戏流程 ================= */
+  function currentChallenge(){ return CHALLENGES[state.idx]; }
+
+  function renderChallenge(){
+    var c = currentChallenge();
+    chNo.textContent = '第 ' + (state.idx + 1) + ' / ' + CHALLENGES.length + ' 关';
+    chTitle.textContent = c.title;
+    chEmoji.src = IC[c.icon];
+    chEmoji.alt = c.title;
+    chScenario.textContent = c.scenario;
+    hintBox.hidden = true;
+    hintBox.textContent = c.hint;
+    feedback.hidden = true;
+    feedback.className = 'feedback';
+    hintBtn.hidden = false;
+    optionsEl.innerHTML = '';
+    c.options.forEach(function(o){
+      var b = document.createElement('button');
+      b.className = 'opt';
+      b.type = 'button';
+      var badge = document.createElement('span'); badge.className = 'opt-badge'; badge.textContent = o.label;
+      var txt = document.createElement('span'); txt.className = 'opt-text'; txt.textContent = o.text;
+      b.appendChild(badge); b.appendChild(txt);
+      b.addEventListener('click', function(){ choose(o, b); });
+      optionsEl.appendChild(b);
+    });
+    challengeCard.hidden = false;
+    winPanel.hidden = true;
+  }
+
+  function disableOptions(){
+    var btns = optionsEl.querySelectorAll('.opt');
+    for(var i=0;i<btns.length;i++) btns[i].disabled = true;
+  }
+
+  function choose(o, btn){
+    sfx.click();
+    if(o.ok){
+      btn.classList.add('correct');
+      disableOptions();
+      sfx.correct();
+      feedback.hidden = false;
+      feedback.className = 'feedback correct';
+      var t = document.createElement('div'); t.className = 'fb-title'; t.textContent = '答对啦！';
+      var d = document.createElement('div'); d.textContent = o.explain;
+      var nb = document.createElement('button');
+      nb.className = 'btn btn-primary'; nb.type = 'button';
+      nb.textContent = (state.idx < CHALLENGES.length - 1) ? '继续下一关 →' : '查看生存证书';
+      nb.addEventListener('click', nextStep);
+      feedback.innerHTML = '';
+      feedback.appendChild(t); feedback.appendChild(d); feedback.appendChild(nb);
+      hintBtn.hidden = true;
+      feedback.scrollIntoView({ behavior:'smooth', block:'nearest' });
+      unlock(currentChallenge().key);
+    }else{
+      btn.classList.add('wrong');
+      btn.disabled = true;
+      sfx.wrong();
+      feedback.hidden = false;
+      feedback.className = 'feedback wrong';
+      var wt = document.createElement('div'); wt.className = 'fb-title'; wt.textContent = '再想想～';
+      var wd = document.createElement('div'); wd.textContent = o.hint;
+      feedback.innerHTML = '';
+      feedback.appendChild(wt); feedback.appendChild(wd);
+      feedback.scrollIntoView({ behavior:'smooth', block:'nearest' });
+    }
+  }
+
+  function nextStep(){
+    sfx.click();
+    if(state.idx < CHALLENGES.length - 1){
+      state.idx++;
+      renderChallenge();
+    }else{
+      winGame();
+    }
+  }
+
+  function unlock(key){
+    state.done[key] = true;
+    var pill = document.getElementById('pill-' + key);
+    pill.classList.add('done');
+    pill.querySelector('.p-st').textContent = '已解锁';
+    var row = document.getElementById('row-' + key);
+    var c = CHALLENGES.filter(function(x){ return x.key === key; })[0];
+    row.classList.remove('locked');
+    row.classList.add('unlocked', 'row-in');
+    row.querySelector('.c-normal').innerHTML = '<img class="ic" src="' + IC.cross + '" alt="">' + c.rowNormal;
+    row.querySelector('.c-mangrove').innerHTML = '<img class="ic" src="' + IC.check + '" alt="">' + c.rowMangrove;
+    setTimeout(function(){ row.classList.remove('row-in'); }, 750);
+    if(key === 'salt'){
+      document.getElementById('fx-salt').classList.add('show');
+      showToast('叶片上冒出了白色盐晶！');
+    }else if(key === 'oxygen'){
+      document.getElementById('fx-roots').classList.add('show');
+      showToast('泥面上长出了一片呼吸根！点右上角“退潮”看看它～');
+    }else if(key === 'baby'){
+      dropPropagule();
+      showToast('一个胎生胚轴掉进泥里，发芽啦！');
+    }else if(key === 'root'){
+      showToast('支柱根和板状根牢牢抓住了滩涂！');
+    }else if(key === 'clean'){
+      showToast('根系开始吸附悬浮物、净化海水啦！');
+    }
+  }
+
+  function dropPropagule(){
+    var p = document.getElementById('fx-baby');
+    p.style.transition = 'transform 1.6s cubic-bezier(.45,0,.75,.55), opacity .5s 1.35s';
+    p.style.transform = 'translate(12px,172px) rotate(30deg)';
+    p.style.opacity = '0.25';
+    setTimeout(function(){
+      var s = document.getElementById('fx-sprout');
+      s.style.transition = 'opacity .9s';
+      s.style.opacity = '1';
+    }, 1500);
+  }
+
+  function winGame(){
+    state.won = true;
+    var row = document.getElementById('row-result');
+    row.classList.remove('locked');
+    row.classList.add('unlocked', 'row-in');
+    row.querySelector('.c-normal').innerHTML = '<img class="ic" src="' + IC.cross + '" alt="">无法在潮间带环境中生存';
+    row.querySelector('.c-mangrove').innerHTML = '<img class="ic" src="' + IC.check + '" alt="">成功适应潮间带的极端环境！';
+    setTimeout(function(){ row.classList.remove('row-in'); }, 750);
+    familyHs.classList.remove('locked');
+    familyHs.classList.add('unlocked');
+    setFamilyIcon('tree');
+    familyHs.querySelector('.hs-label').textContent = '认识红树家族';
+    challengeCard.hidden = true;
+    winPanel.hidden = false;
+    confetti(90);
+    sfx.win();
+    showToast('恭喜！小红树成功在潮间带安了家！');
+  }
+
+  function restart(){
+    state.idx = 0; state.done = {}; state.won = false;
+    CHALLENGES.forEach(function(c){
+      var pill = document.getElementById('pill-' + c.key);
+      pill.classList.remove('done');
+      pill.querySelector('.p-st').textContent = '未解锁';
+      var row = document.getElementById('row-' + c.key);
+      row.classList.remove('unlocked', 'row-in');
+      row.classList.add('locked');
+      row.querySelector('.c-normal').textContent = LOCK_TEXT;
+      row.querySelector('.c-mangrove').textContent = LOCK_TEXT;
+    });
+    var rrow = document.getElementById('row-result');
+    rrow.classList.remove('unlocked', 'row-in');
+    rrow.classList.add('locked');
+    rrow.querySelector('.c-normal').textContent = LOCK_TEXT;
+    rrow.querySelector('.c-mangrove').textContent = LOCK_TEXT;
+    document.getElementById('fx-salt').classList.remove('show');
+    document.getElementById('fx-roots').classList.remove('show');
+    var p = document.getElementById('fx-baby');
+    p.style.transition = 'none';
+    p.style.transform = '';
+    p.style.opacity = '';
+    var sp = document.getElementById('fx-sprout');
+    sp.style.transition = 'none';
+    sp.style.opacity = '0';
+    familyHs.classList.remove('unlocked');
+    familyHs.classList.add('locked');
+    setFamilyIcon('lock');
+    familyHs.querySelector('.hs-label').textContent = '完成挑战后解锁';
+    renderChallenge();
+    sfx.click();
+  }
+
+  /* ================= 弹窗 ================= */
+  function openModal(cfg){
+    mEmoji.src = IC[cfg.icon] || '';
+    mEmoji.alt = cfg.title;
+    mTitle.textContent = cfg.title;
+    mBody.innerHTML = cfg.body;
+    if(cfg.extra){ mExtra.hidden = false; mExtra.textContent = cfg.extra; } else { mExtra.hidden = true; }
+    if(cfg.cards){
+      mCards.hidden = false;
+      mCards.innerHTML = '';
+      cfg.cards.forEach(function(card){
+        var d = document.createElement('div');
+        d.className = 'fam-card';
+        var ico = document.createElement('img'); ico.className = 'fc-ico-img'; ico.src = IC[card.ico]; ico.alt = card.name;
+        var nm = document.createElement('div'); nm.className = 'fc-name'; nm.textContent = card.name;
+        var tg = document.createElement('div'); tg.className = 'fc-tag'; tg.textContent = card.tag;
+        var ds = document.createElement('div'); ds.className = 'fc-desc'; ds.textContent = card.desc;
+        d.appendChild(ico); d.appendChild(nm); d.appendChild(tg); d.appendChild(ds);
+        mCards.appendChild(d);
+      });
+    }else{
+      mCards.hidden = true; mCards.innerHTML = '';
+    }
+    mActions.innerHTML = '';
+    if(cfg.actions){
+      cfg.actions.forEach(function(a){
+        var b = document.createElement('button');
+        b.className = 'btn ' + (a.style || 'btn-primary');
+        b.type = 'button';
+        b.textContent = a.text;
+        b.addEventListener('click', a.fn);
+        mActions.appendChild(b);
+      });
+    }else{
+      var cb = document.createElement('button');
+      cb.className = 'btn btn-primary'; cb.type = 'button'; cb.textContent = '知道啦！';
+      cb.addEventListener('click', closeModal);
+      mActions.appendChild(cb);
+    }
+    mask.hidden = false;
+  }
+
+  function closeModal(){ mask.hidden = true; }
+
+  function openEgg(key){
+    if(key === 'family' && !state.won){
+      showToast('先完成全部五个挑战，解锁红树家族！');
+      sfx.wrong();
+      return;
+    }
+    sfx.click();
+    openModal(EGGS[key] || FAMILY);
+  }
+
+  function openCert(){
+    openModal({
+      icon: CERT.icon, title: CERT.title, body: CERT.body, extra: CERT.extra,
+      actions: [
+        { text: '再玩一次', style: 'btn-ghost', fn: function(){ closeModal(); restart(); } },
+        { text: '认识红树家族', style: 'btn-sun', fn: function(){ openModal(FAMILY); } },
+        { text: '查看对比表', style: 'btn-primary', fn: function(){
+            closeModal();
+            document.getElementById('tableCard').scrollIntoView({ behavior:'smooth' });
+          } }
+      ]
+    });
+  }
+
+  /* ================= 潮汐切换 ================= */
+  var tideHighBtn = $('#tideHigh'), tideLowBtn = $('#tideLow');
+  tideHighBtn.addEventListener('click', function(){
+    scene.classList.remove('tide-low');
+    scene.classList.add('tide-high');
+    tideHighBtn.classList.add('active');
+    tideLowBtn.classList.remove('active');
+    sweep(true);
+    showToast('涨潮了！海水漫过滩涂，呼吸根暂时藏进水里。');
+  });
+  tideLowBtn.addEventListener('click', function(){
+    scene.classList.remove('tide-high');
+    scene.classList.add('tide-low');
+    tideLowBtn.classList.add('active');
+    tideHighBtn.classList.remove('active');
+    sweep(false);
+    showToast('退潮了！呼吸根露出泥面，叶片上可能还有盐晶。');
+  });
+
+  /* ================= 事件绑定 ================= */
+  startBtn.addEventListener('click', function(){
+    sceneIntro.hidden = true;
+    renderChallenge();
+    sfx.click();
+  });
+  hintBtn.addEventListener('click', function(){
+    hintBox.hidden = !hintBox.hidden;
+    sfx.click();
+  });
+  document.querySelectorAll('[data-egg]').forEach(function(h){
+    h.addEventListener('click', function(){ openEgg(h.getAttribute('data-egg')); });
+  });
+  $('#certBtn').addEventListener('click', openCert);
+  $('#familyBtn').addEventListener('click', function(){ openModal(FAMILY); });
+  $('#againBtn').addEventListener('click', restart);
+  $('#restartBtn').addEventListener('click', restart);
+  $('#dexBtn').addEventListener('click', function(){ sfx.click(); openModal(DEX); });
+  modalClose.addEventListener('click', closeModal);
+  mask.addEventListener('click', function(e){ if(e.target === mask) closeModal(); });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && !mask.hidden){ closeModal(); return; }
+    if(sceneIntro.hidden === false) return;
+    if(!challengeCard.hidden && !feedback.hidden && feedback.classList.contains('correct')){
+      if(e.key === 'Enter'){ var nb = feedback.querySelector('button'); if(nb) nb.click(); }
+      return;
+    }
+    if(challengeCard.hidden) return;
+    if(e.key === '1' || e.key === '2' || e.key === '3'){
+      var btns = optionsEl.querySelectorAll('.opt');
+      var b = btns[parseInt(e.key, 10) - 1];
+      if(b && !b.disabled) b.click();
+    }else if(e.key === 'h' || e.key === 'H'){
+      hintBtn.click();
+    }
+  });
+
+  /* 全屏 */
+  var fsBtn = $('#fsBtn');
+  function updateFsBtn(){
+    fsTxt.textContent = document.fullscreenElement ? '退出全屏' : '全屏';
+  }
+  fsBtn.addEventListener('click', function(){
+    var el = document.documentElement;
+    if(!document.fullscreenElement){
+      var req = el.requestFullscreen || el.webkitRequestFullscreen;
+      if(req) req.call(el);
+    }else{
+      var exit = document.exitFullscreen || document.webkitExitFullscreen;
+      if(exit) exit.call(document);
+    }
+  });
+  document.addEventListener('fullscreenchange', updateFsBtn);
+  document.addEventListener('webkitfullscreenchange', updateFsBtn);
+
+  /* 音效开关 */
+  $('#soundBtn').addEventListener('click', function(){
+    soundOn.v = !soundOn.v;
+    soundImg.src = soundOn.v ? IC.sound : IC.muted;
+    soundTxt.textContent = soundOn.v ? '音效开' : '音效关';
+    if(soundOn.v) sfx.click();
+  });
+
+  /* 初始化 */
+  scene.classList.add('tide-high');
+  renderChallenge();
+})();
+</script>
+</body>
+</html>
